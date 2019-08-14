@@ -1,0 +1,7 @@
+node_modules/
+dist/
+data/
+.vscode/
+settings.ts
+tslint.json
+yarn-error.log
