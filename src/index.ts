@@ -1,7 +1,7 @@
 import Bot from './api/bot';
 import token from '../settings';
 
-const paren = (str: string) => {
+const paren = (str: string): string => {
     const left = '({<[（{《「';
     const right = ')}>]）}》」';
     const qwq = '○(￣□￣○)';
@@ -25,7 +25,7 @@ const paren = (str: string) => {
 
 
 
-const main = () => {
+const main = (): void => {
     const bot = new Bot(token);
     bot.on(/.*/, (id, props) => {
         const p = paren(props[0]);
