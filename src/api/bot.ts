@@ -46,7 +46,6 @@ class Bot {
     }
     public async getUpdates(): Promise<BotDate> {
         const res = await this.requester.get('/getUpdates');
-        console.log(res.data);
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/getUpdates failed");
     }
@@ -66,7 +65,6 @@ class Bot {
             new_upload_id = newData.result[newData.result.length - 1].update_id;
             let id: number;
             let text: string;
-            console.log(newData.result[newData.result.length - 1].message)
             if (newData.ok && newData.result) {
                 if (new_upload_id !== old_upload_id) {
                     id = newData.result[newData.result.length - 1].message.from.id;
