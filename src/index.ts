@@ -27,9 +27,10 @@ const paren = (str: string) => {
 const main = () => {
     const bot = new Bot(token);
     bot.on(/.*/, (id, props) => {
-        const p = paren(props[0])
+        const p = paren(props[0]);
         if (p) bot.sendMessage(id, p); 
     });
+    bot.listen();
 }
 
 main();
