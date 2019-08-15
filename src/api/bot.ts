@@ -79,7 +79,7 @@ class Bot {
                     old_upload_id = new_upload_id;
                 }
             }
-            sleep(5000);
+            await sleep(5000);
         }
     }
     public on(re: RegExp, cb: Function): void {
