@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { isRegExp, isString } from 'util';
 
 interface BotDate {
     ok: boolean;
@@ -29,12 +30,12 @@ interface BotDateResultMessageFrom {
 
 class Bot {
     private readonly requester: AxiosInstance;
-    private funcs: Map<RegExp, Function>;
+    private funcs: Map<RegExp | string | string[], Function>;
     public constructor(token: string, url = "https://api.telegram.org/bot") {
         this.requester = axios.create({
             baseURL: url + token,
         });
-        this.funcs = new Map<RegExp, Function>();
+        this.funcs = new Map<RegExp | string | string[], Function>();
     }
     public async sendMessage(chat_id: number, text: string): Promise<BotDate> {
         const res = await this.requester.post('/sendMessage', {
@@ -69,11 +70,23 @@ class Bot {
                 if (new_upload_id !== old_upload_id) {
                     id = newData.result[newData.result.length - 1].message.from.id;
                     text = newData.result[newData.result.length - 1].message.text;
-                    this.funcs.forEach((cb, reg) => {
-                        const match = reg.exec(text)
-                        if (match) {
-                            const props = match[0].split(' ');
+                    this.funcs.forEach((cb, arg) => {
+                        let match: RegExpExecArray;
+                        let props: string[];
+                        if (isRegExp(arg)) {
+                            match = arg.exec(text);
+                            if (match) props = match[0].split(' ');
                             cb(id, props);
+                        }
+                        else if (isString(arg)) {
+                            if (text.split(' ')[0] === arg) {
+                                props = text.split(' ');
+                                cb(id, props);
+                            }
+                        }
+                        else {
+                            props = text.split(' ');
+                            if (arg.indexOf(props[0]) !== -1) cb(id, props)
                         }
                     });
                     old_upload_id = new_upload_id;
@@ -82,8 +95,8 @@ class Bot {
             await sleep(5000);
         }
     }
-    public on(re: RegExp, cb: Function): void {
-        this.funcs.set(re, cb);
+    public on(match: RegExp | string | string[], cb: Function): void {
+        this.funcs.set(match, cb);
     }
 }
 

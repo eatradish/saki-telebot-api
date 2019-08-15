@@ -26,6 +26,9 @@ const main = (): void => {
         const p = paren(props[0]);
         if (p) bot.sendMessage(id, p); 
     });
+    bot.on('/start', (id) => {
+        bot.sendMessage(id, '咸鱼叫，咸鱼叫，咸鱼被吃掉！');
+    })
     bot.listen();
 }
 
