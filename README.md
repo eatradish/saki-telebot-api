@@ -1,5 +1,5 @@
 # TeleParen
-Parenbot for Telegram Bot, Use typescript. @@parenng_bot
+Parenbot for Telegram Bot, Use typescript. @parenng_bot
 
 ```
 （（（
