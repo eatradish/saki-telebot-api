@@ -4,6 +4,7 @@ import token from '../settings';
 const paren = (str: string) => {
     const left = '({<[（{《「';
     const right = ')}>]）}》」';
+    const qwq = '○(￣□￣○)'
     const stack = [];
     for (let i = 0; i < str.length; i++) {
         if (left.indexOf(str[i]) !== -1) stack.push(str[i]);
@@ -19,7 +20,7 @@ const paren = (str: string) => {
     for (const index of resList) {
         res = res + index;
     }
-    return res;
+    return res + qwq;
 }
 
 
