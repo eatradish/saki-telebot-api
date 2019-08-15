@@ -32,7 +32,8 @@ class Bot {
     private readonly requester: AxiosInstance;
     private funcs: Map<RegExp | string | string[], Function>;
     private time: number;
-    public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
+    public constructor({ token, url = "https://api.telegram.org/bot", time = 1000 }:
+    { token: string; url?: string; time?: number }) {
         this.requester = axios.create({
             baseURL: url + token,
         });
@@ -53,25 +54,27 @@ class Bot {
         else throw new Error("/getUpdates failed");
     }
     public async listen(): Promise<void> {
-        let data: undefined | BotDate;
-        let new_upload_id: number;
-        let old_upload_id: number;
+        let update_id: number;
+        let new_update_id: undefined | number;
         const sleep = ((time: number): Promise<NodeJS.Timeout> => {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
+        
         while (true) {
-            if (data === undefined) {
-                data = await this.getUpdates();
-                old_upload_id = data.result[data.result.length - 1].update_id;
+            const data = await this.getUpdates();
+            if (update_id === undefined && new_update_id === undefined) {
+                update_id = data.result[data.result.length - 1].update_id;
+                new_update_id = update_id + 1;
             }
-            const newData = await this.getUpdates();
-            new_upload_id = newData.result[newData.result.length - 1].update_id;
+            else {
+                update_id = data.result[data.result.length - 1].update_id;
+            }
             let id: number;
             let text: string;
-            if (newData.ok && newData.result) {
-                if (new_upload_id !== old_upload_id) {
-                    id = newData.result[newData.result.length - 1].message.from.id;
-                    text = newData.result[newData.result.length - 1].message.text;
+            if (data.ok && data.result) {
+                if (update_id === new_update_id) {
+                    id = data.result[data.result.length - 1].message.from.id;
+                    text = data.result[data.result.length - 1].message.text;
                     this.funcs.forEach((cb, arg) => {
                         let match: RegExpExecArray;
                         let props: string[];
@@ -91,7 +94,7 @@ class Bot {
                             if (arg.indexOf(props[0]) !== -1) cb(id, props)
                         }
                     });
-                    old_upload_id = new_upload_id;
+                    new_update_id += 1;
                 }
             }
             await sleep(this.time);
