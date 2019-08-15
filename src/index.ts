@@ -24,7 +24,7 @@ const main = (): void => {
     const bot = new Bot(token);
     bot.on(/.*/, (id, props) => {
         const p = paren(props[0]);
-        if (p !== '') bot.sendMessage(id, p); 
+        if (p) bot.sendMessage(id, p); 
     });
     bot.listen();
 }
