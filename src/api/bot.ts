@@ -50,7 +50,7 @@ class Bot {
         else throw new Error("/getUpdates failed");
     }
     public async listen(): Promise<void> {
-        let data;
+        let data: undefined | BotDate;
         let new_upload_id: number;
         let old_upload_id: number;
         const sleep = ((time: number): Promise<NodeJS.Timeout> => {
