@@ -23,37 +23,13 @@ const paren = (str: string) => {
 }
 
 
-const bot = new Bot(token);
-const sleep = ((time: number) => {
-    return new Promise(resolve => setTimeout(resolve, time));
-});
 
-const main = async () => {
-    let data;
-    let new_upload_id;
-    let old_upload_id;
-    while (true) {
-        if (data === undefined) {
-            data = await bot.getUpdates();
-            old_upload_id = data.result[data.result.length - 1].update_id;
-        }
-        const newData = await bot.getUpdates();
-        new_upload_id = newData.result[newData.result.length - 1].update_id;
-        let id;
-        let text;
-        if (newData.ok && newData.result) {
-            if (new_upload_id !== old_upload_id) {
-                id = newData.result[newData.result.length - 1].message.from.id;
-                text = newData.result[newData.result.length - 1].message.text;
-                const p = paren(text);
-                let result;
-                if (p !== undefined) result = await bot.sendMessage(id, p);
-                if (result) console.log(result);
-                old_upload_id = new_upload_id;
-            }
-        }
-        await sleep(5000);
-    }
+const main = () => {
+    const bot = new Bot(token);
+    bot.on(/.*/, (id, props) => {
+        const p = paren(props[0])
+        if (p) bot.sendMessage(id, p); 
+    });
 }
 
 main();
