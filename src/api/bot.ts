@@ -58,16 +58,10 @@ class Bot {
         const sleep = ((time: number): Promise<NodeJS.Timeout> => {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
-        
         while (true) {
             const data = await this.getUpdates();
-            if (update_id === undefined && new_update_id === undefined) {
-                update_id = data.result[data.result.length - 1].update_id;
-                new_update_id = update_id + 1;
-            }
-            else {
-                update_id = data.result[data.result.length - 1].update_id;
-            }
+            update_id = data.result[data.result.length - 1].update_id;
+            if (new_update_id === undefined) new_update_id = update_id + 1;
             let id: number;
             let text: string;
             if (data.ok && data.result) {
@@ -90,7 +84,7 @@ class Bot {
                         }
                         else {
                             props = text.split(' ');
-                            if (arg.indexOf(props[0]) !== -1) cb(id, props)
+                            if (arg.indexOf(props[0]) !== -1) cb(id, props);
                         }
                     });
                     new_update_id += 1;
