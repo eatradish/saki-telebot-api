@@ -32,8 +32,7 @@ class Bot {
     private readonly requester: AxiosInstance;
     private funcs: Map<RegExp | string | string[], Function>;
     private time: number;
-    public constructor({ token, url = "https://api.telegram.org/bot", time = 1000 }:
-    { token: string; url?: string; time?: number }) {
+    public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000){
         this.requester = axios.create({
             baseURL: url + token,
         });
