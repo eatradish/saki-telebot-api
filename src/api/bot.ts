@@ -31,11 +31,13 @@ interface BotDateResultMessageFrom {
 class Bot {
     private readonly requester: AxiosInstance;
     private funcs: Map<RegExp | string | string[], Function>;
-    public constructor(token: string, url = "https://api.telegram.org/bot") {
+    private time: number;
+    public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
         this.requester = axios.create({
             baseURL: url + token,
         });
         this.funcs = new Map<RegExp | string | string[], Function>();
+        this.time = time;
     }
     public async sendMessage(chat_id: number, text: string): Promise<BotDate> {
         const res = await this.requester.post('/sendMessage', {
@@ -92,7 +94,7 @@ class Bot {
                     old_upload_id = new_upload_id;
                 }
             }
-            await sleep(5000);
+            await sleep(this.time);
         }
     }
     public on(match: RegExp | string | string[], cb: Function): void {
