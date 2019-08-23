@@ -1,25 +1,35 @@
 import axios, { AxiosInstance } from 'axios';
 import { isRegExp, isString } from 'util';
 
-interface BotDate {
+export interface BotDate {
     ok: boolean;
     result: BotDateResult[];
 }
 
-interface BotDateResult {
+export interface BotDateResult {
     update_id: number;
-    message: BotDateResultMessage;
+    message?: BotDateResultMessage;
+    channel_post?: BotDateResultChannelPost;
 }
 
-interface BotDateResultMessage {
+export interface BotDateResultMessage {
     message_id: number;
     from: BotDateResultMessageFrom;
-    chat: {};
+    chat: BotDateResultMessageChat;
     date: number;
     text: string;
 }
 
-interface BotDateResultMessageFrom {
+export interface BotDateResultMessageChat {
+    id: number;
+    first_name: string;
+    last_name: string;
+    username: string;
+    type: string;
+    title?: string;
+}
+
+export interface BotDateResultMessageFrom {
     id: number;
     is_bot: boolean;
     first_name: string;
@@ -28,11 +38,25 @@ interface BotDateResultMessageFrom {
     language_code: string;
 }
 
+export interface BotDateResultChannelPost {
+    message_id: number;
+    chat: BotDateResultChannelPostChat;
+    data: number;
+    text: string;
+}
+
+export interface BotDateResultChannelPostChat {
+    id: number;
+    title: string;
+    username: string;
+    type: string;
+}
+
 class Bot {
     private readonly requester: AxiosInstance;
     private funcs: Map<RegExp | string | string[], Function>;
     private time: number;
-    public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000){
+    public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
         this.requester = axios.create({
             baseURL: url + token,
         });
@@ -59,32 +83,33 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
+            let msg: BotDateResultMessage | BotDateResultChannelPost;
             const data = await this.getUpdates();
+            const newDate = data.result[data.result.length - 1];
+            if (newDate.message !== undefined) msg = data.result[data.result.length - 1].message;
+            else if (newDate.channel_post !== undefined) msg = data.result[data.result.length - 1].channel_post
             update_id = data.result[data.result.length - 1].update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
-            let id: number;
-            let text: string;
             if (data.ok && data.result) {
                 if (update_id === new_update_id) {
-                    id = data.result[data.result.length - 1].message.from.id;
-                    text = data.result[data.result.length - 1].message.text;
                     this.funcs.forEach((cb, arg) => {
                         let match: RegExpExecArray;
                         let props: string[];
+                        const text = msg.text;
                         if (isRegExp(arg)) {
                             match = arg.exec(text);
                             if (match) props = match[0].split(' ');
-                            cb(id, props);
+                            cb(msg, props)
                         }
                         else if (isString(arg)) {
                             if (text.split(' ')[0] === arg) {
                                 props = text.split(' ');
-                                cb(id, props);
+                                cb(msg, props);
                             }
                         }
                         else {
                             props = text.split(' ');
-                            if (arg.indexOf(props[0]) !== -1) cb(id, props);
+                            if (arg.indexOf(props[0]) !== -1) cb(msg, props);
                         }
                     });
                     new_update_id += 1;
@@ -97,5 +122,6 @@ class Bot {
         this.funcs.set(match, cb);
     }
 }
+
 
 export default Bot;

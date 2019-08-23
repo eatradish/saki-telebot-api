@@ -21,7 +21,7 @@ const paren = (str: string): string => {
 }
 
 const main = (): void => {
-    const bot = new Bot(token);
+    const bot = new Bot(token.paren);
     bot.on(/.*/, (id, props) => {
         const p = paren(props[0]);
         if (p) bot.sendMessage(id, p); 

@@ -15,6 +15,7 @@
     "typescript": "^3.5.3"
   },
   "scripts": {
-    "start": "ts-node-dev --respawn --transpileOnly src/index.ts"
+    "start_paren": "ts-node-dev --respawn --transpileOnly src/paren.ts",
+    "start_botClient": "ts-node-dev --respawn --transpileOnly src/botClient.ts"
   }
 }
