@@ -40,7 +40,7 @@ class Bot {
             let msg: BotAPI.BotGetUpdatesMessage | BotAPI.BotGetUpdatesChannelPost;
             let data = await this.getUpdates();
             if (data.result.length === 100) {
-                data = await this.getUpdates(data.result[50].update_id);
+                data = await this.getUpdates(data.result[99].update_id);
             }
             const newDate = data.result[data.result.length - 1];
             if (newDate.message !== undefined) msg = data.result[data.result.length - 1].message;

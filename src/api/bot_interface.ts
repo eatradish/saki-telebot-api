@@ -10,28 +10,28 @@ export interface BotSendMessage {
 
 export interface BotSendMessageResult {
     message_id: boolean;
-    from: BotGetUpdatesMessageFrom;
-    chat: BotGetUpdatesMessageChat;
+    from: BotGetUpdatesResultMessageFrom;
+    chat: BotGetUpdatesResultMessageChat;
     data: number;
     text: string;
 }
 
 export interface BotGetUpdatesResult {
     update_id: number;
-    message?: BotGetUpdatesMessage;
-    channel_post?: BotGetUpdatesChannelPost;
+    message?: BotGetUpdatesResultMessage;
+    channel_post?: BotGetUpdatesResultChannelPost;
     edited_message?: {};
 }
 
-export interface BotGetUpdatesMessage {
+export interface BotGetUpdatesResultMessage {
     message_id: number;
-    from: BotGetUpdatesMessageFrom;
-    chat: BotGetUpdatesMessageChat;
+    from: BotGetUpdatesResultMessageFrom;
+    chat: BotGetUpdatesResultMessageChat;
     date: number;
     text: string;
 }
 
-export interface BotGetUpdatesMessageChat {
+export interface BotGetUpdatesResultMessageChat {
     id: number;
     first_name: string;
     last_name: string;
@@ -40,7 +40,7 @@ export interface BotGetUpdatesMessageChat {
     title?: string;
 }
 
-export interface BotGetUpdatesMessageFrom {
+export interface BotGetUpdatesResultMessageFrom {
     id: number;
     is_bot: boolean;
     first_name: string;
@@ -49,14 +49,14 @@ export interface BotGetUpdatesMessageFrom {
     language_code?: string;
 }
 
-export interface BotGetUpdatesChannelPost {
+export interface BotGetUpdatesResultChannelPost {
     message_id: number;
-    chat: BotGetUpdatesChannelPostChat;
+    chat: BotGetUpdatesResultChannelPostChat;
     data: number;
     text: string;
 }
 
-export interface BotGetUpdatesChannelPostChat {
+export interface BotGetUpdatesResultChannelPostChat {
     id: number;
     title: string;
     username: string;
