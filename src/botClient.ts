@@ -2,7 +2,7 @@ import Bot, { BotDateResultMessage, BotDateResultChannelPost, BotDate } from './
 import token from '../settings';
 import * as readline from 'readline';
 
-const main = (): void => {
+const main = async (): Promise<void> => {
     const bot = new Bot(token.botClient);
     bot.on(/.*/, (msg: BotDateResultMessage | BotDateResultChannelPost) => {
         let a: string;
@@ -21,9 +21,8 @@ const main = (): void => {
     });
     bot.listen();
 
-    const send = async (): Promise<void> => {
+    const send = (map: Map<number, string>): void => {
         let result: BotDate
-        const map = await bot.getUserList();
         console.log(map);
         const r = readline.createInterface({
             input: process.stdin,
@@ -31,11 +30,11 @@ const main = (): void => {
         });
         r.setPrompt('>');
         r.on('line', async (input) => {
-            const data = input.split(' ');
+            const data = input.split(', ');
             const id = Number(data[0])
             const text = data.splice(-1, 1).join('');
             if (id !== undefined && id !== NaN) result = await bot.sendMessage(id, text);
-            if (result !== undefined) console.log('You: ' + result);
+            if (result !== undefined) console.log('You: ' + result.result);
         });
         /*r.question('sendMessage: (id text) ', async (input) => {
             const data = input.split(' ');
@@ -45,7 +44,8 @@ const main = (): void => {
             if (id !== undefined && id !== NaN) bot.sendMessage(id, text);
         });*/
     }
-   send();
+    const map = await bot.getUserList()
+    send(map);
 }
 
 main();

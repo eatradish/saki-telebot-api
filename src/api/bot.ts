@@ -72,9 +72,13 @@ class Bot {
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/sendMessage failed");
     }
-    public async getUpdates(): Promise<BotDate> {
-        const res = await this.requester.get('/getUpdates');
-        if (res.status === 200 && res.data) return res.data;
+    public async getUpdates(offset?: number): Promise<BotDate> {
+        const res = await this.requester.post('/getUpdates', {
+            offset,
+        });
+        if (res.status === 200 && res.data){
+            return res.data;
+        }
         else throw new Error("/getUpdates failed");
     }
     public async listen(): Promise<void> {
@@ -85,7 +89,10 @@ class Bot {
         });
         while (true) {
             let msg: BotDateResultMessage | BotDateResultChannelPost;
-            const data = await this.getUpdates();
+            let data = await this.getUpdates();
+            if (data.result.length === 100) {
+                data = await this.getUpdates(data.result[50].update_id);
+            }
             const newDate = data.result[data.result.length - 1];
             if (newDate.message !== undefined) msg = data.result[data.result.length - 1].message;
             else if (newDate.channel_post !== undefined) msg = data.result[data.result.length - 1].channel_post
