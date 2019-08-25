@@ -10,6 +10,7 @@ export interface BotDateResult {
     update_id: number;
     message?: BotDateResultMessage;
     channel_post?: BotDateResultChannelPost;
+    edited_message?: {};
 }
 
 export interface BotDateResultMessage {
@@ -120,6 +121,34 @@ class Bot {
     }
     public on(match: RegExp | string | string[], cb: Function): void {
         this.funcs.set(match, cb);
+    }
+
+    public async getUserList(): Promise<Map<number, string> | undefined> {
+        const data = await this.getUpdates();
+        const map = new Map<number, string>();
+        let name: string;
+        let id: number;
+        for (const index of data.result) {
+            let type: string;
+            if (index.channel_post) type = 'channel';
+            else if(index.edited_message) continue;
+            else type = index.message.chat.type;
+            if (type === 'group' || type === 'supergroup') {
+                name = index.message.chat.title;
+                id = index.message.chat.id;
+            }
+            else if (type === 'private') {
+                name = index.message.chat.username;
+                id = index.message.chat.id;
+            }
+            else if (type === 'channel') {
+                name = index.channel_post.chat.title;
+                id = index.channel_post.chat.id;
+            }
+            else continue;
+            if (map.get(id) === undefined) map.set(id, name);
+        }
+        return map;
     }
 }
 

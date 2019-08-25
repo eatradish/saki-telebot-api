@@ -1,0 +1,364 @@
+
+{
+  "header": {
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20190825.203058.63873.0.001.json",
+    "dumpEventTime": "2019-08-25T20:30:58Z",
+    "dumpEventTimeStamp": "1566736258539",
+    "processId": 63873,
+    "cwd": "/home/sakiiily/TeleParen",
+    "commandLine": [
+      "/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node",
+      "-r",
+      "/tmp/ts-node-dev-hook-7137929845118072.js",
+      "/home/sakiiily/TeleParen/node_modules/ts-node-dev/lib/wrap.js",
+      "src/botClient.ts"
+    ],
+    "nodejsVersion": "v12.3.0",
+    "glibcVersionRuntime": "2.29",
+    "glibcVersionCompiler": "2.17",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "linux",
+    "componentVersions": {
+      "node": "12.3.0",
+      "v8": "7.4.288.27-node.17",
+      "uv": "1.28.0",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "72",
+      "nghttp2": "1.38.0",
+      "napi": "4",
+      "llhttp": "1.1.3",
+      "http_parser": "2.8.0",
+      "openssl": "1.1.1b",
+      "cldr": "35.1",
+      "icu": "64.2",
+      "tz": "2019a",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v12.3.0/node-v12.3.0-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.3.0/node-v12.3.0.tar.gz"
+    },
+    "osName": "Linux",
+    "osRelease": "5.2.9-aosc-main",
+    "osVersion": "#1 SMP PREEMPT Fri Aug 16 15:10:01 UTC 2019",
+    "osMachine": "x86_64",
+    "host": "eat-x220i"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x0000000000aab555",
+      "symbol": "report::TriggerNodeReport(v8::Isolate*, node::Environment*, char const*, char const*, std::string const&, v8::Local<v8::String>) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x000000000098e8f3",
+      "symbol": "node::OnFatalError(char const*, char const*) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b0ad1e",
+      "symbol": "v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, bool) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b0b099",
+      "symbol": "v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, bool) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f15815",
+      "symbol": " [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f2017b",
+      "symbol": "v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::GCCallbackFlags) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f20e97",
+      "symbol": "v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f23935",
+      "symbol": "v8::internal::Heap::AllocateRawWithRetryOrFail(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000eee960",
+      "symbol": "v8::internal::Factory::NewFillerObject(int, bool, v8::internal::AllocationSpace) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x00000000011c08cf",
+      "symbol": "v8::internal::Runtime_AllocateInTargetSpace(int, unsigned long*, v8::internal::Isolate*) [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000001a89142",
+      "symbol": " [/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node]"
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 2153332736,
+    "totalCommittedMemory": 2148551112,
+    "usedMemory": 2146182568,
+    "availableMemory": 49582352,
+    "memoryLimit": 2197815296,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 524288,
+        "committedMemory": 32024,
+        "capacity": 523976,
+        "used": 31712,
+        "available": 492264
+      },
+      "new_space": {
+        "memorySize": 4194304,
+        "committedMemory": 689912,
+        "capacity": 2095904,
+        "used": 108816,
+        "available": 1987088
+      },
+      "old_space": {
+        "memorySize": 2147082240,
+        "committedMemory": 2146794920,
+        "capacity": 2145780736,
+        "used": 2145256200,
+        "available": 524536
+      },
+      "code_space": {
+        "memorySize": 688128,
+        "committedMemory": 312000,
+        "capacity": 240704,
+        "used": 240704,
+        "available": 0
+      },
+      "map_space": {
+        "memorySize": 528384,
+        "committedMemory": 406864,
+        "capacity": 279520,
+        "used": 279520,
+        "available": 0
+      },
+      "large_object_space": {
+        "memorySize": 266240,
+        "committedMemory": 266240,
+        "capacity": 262160,
+        "used": 262160,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 49152,
+        "committedMemory": 49152,
+        "capacity": 3456,
+        "used": 3456,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 2095904,
+        "used": 0,
+        "available": 2095904
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 118.049,
+    "kernelCpuSeconds": 2.90313,
+    "cpuConsumptionPercent": 257.346,
+    "maxRss": 2244108288,
+    "pageFaults": {
+      "IORequired": 19,
+      "IONotRequired": 626681
+    },
+    "fsActivity": {
+      "reads": 2712,
+      "writes": 0
+    }
+  },
+  "uvthreadResourceUsage": {
+    "userCpuSeconds": 34.8054,
+    "kernelCpuSeconds": 1.14119,
+    "cpuConsumptionPercent": 76.4821,
+    "fsActivity": {
+      "reads": 2712,
+      "writes": 0
+    }
+  },
+  "libuv": [
+  ],
+  "environmentVariables": {
+    "SHELL": "/bin/zsh",
+    "SESSION_MANAGER": "local/eat-x220i:@/tmp/.ICE-unix/2365,unix/eat-x220i:/tmp/.ICE-unix/2365",
+    "WINDOWID": "52428807",
+    "COLORTERM": "truecolor",
+    "npm_package_main": "index.js",
+    "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session3",
+    "GTK_IM_MODULE": "fcitx5",
+    "LANGUAGE": "en_US",
+    "NODE": "/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node",
+    "npm_config_ignore_scripts": "",
+    "JAVA_HOME": "/usr/lib/java",
+    "SHELL_SESSION_ID": "a29b697d84c040fca0dfbadf4c25c4b8",
+    "npm_config_argv": "{\"remain\":[],\"cooked\":[\"run\",\"start_botClient\"],\"original\":[\"start_botClient\"]}",
+    "XMODIFIERS": "@im=fcitx",
+    "npm_config_bin_links": "true",
+    "DESKTOP_SESSION": "/usr/share/xsessions/plasma",
+    "LC_MONETARY": "C",
+    "GTK_RC_FILES": "/etc/gtk/gtkrc:/home/sakiiily/.gtkrc:/home/sakiiily/.config/gtkrc",
+    "GTK_MODULES": "canberra-gtk-module",
+    "XDG_SEAT": "seat0",
+    "npm_package_dependencies_axios": "^0.19.0",
+    "PWD": "/home/sakiiily/TeleParen",
+    "npm_config_save_prefix": "^",
+    "XDG_SESSION_DESKTOP": "KDE",
+    "LOGNAME": "sakiiily",
+    "XDG_SESSION_TYPE": "x11",
+    "npm_package_readmeFilename": "README.md",
+    "MANPATH": "/home/sakiiily/.nvm/versions/node/v12.3.0/share/man:/usr/share/man:/usr/local/share/man",
+    "_": "/home/sakiiily/TeleParen/node_modules/.bin/ts-node-dev",
+    "XAUTHORITY": "/tmp/xauth-1000-_0",
+    "TZ": "Asia/Shanghai",
+    "npm_package_dependencies_ts_node_dev": "^1.0.0-pre.40",
+    "npm_package_dependencies__typescript_eslint_eslint_plugin": "^2.0.0",
+    "LD_PRELOAD": "/usr/lib/libproxychains4.so",
+    "GTK2_RC_FILES": "/etc/gtk-2.0/gtkrc:/home/sakiiily/.gtkrc-2.0:/home/sakiiily/.config/gtkrc-2.0",
+    "HOME": "/home/sakiiily",
+    "SSH_ASKPASS": "/usr/bin/ksshaskpass",
+    "npm_config_version_git_tag": "true",
+    "LANG": "en_US.UTF-8",
+    "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:",
+    "XDG_CURRENT_DESKTOP": "KDE",
+    "npm_config_init_license": "MIT",
+    "KONSOLE_DBUS_SERVICE": ":1.37",
+    "npm_package_version": "1.0.0",
+    "KONSOLE_DBUS_SESSION": "/Sessions/6",
+    "PROFILEHOME": "",
+    "npm_config_version_commit_hooks": "true",
+    "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",
+    "KONSOLE_VERSION": "190800",
+    "INIT_CWD": "/home/sakiiily/TeleParen",
+    "npm_package_dependencies_eslint": "^6.1.0",
+    "KDE_SESSION_UID": "1000",
+    "npm_lifecycle_script": "ts-node-dev --respawn --transpileOnly src/botClient.ts",
+    "npm_package_description": "Parenbot for Telegram Bot, Use typescript. @parenng_bot",
+    "NVM_DIR": "/home/sakiiily/.nvm",
+    "npm_config_version_tag_prefix": "v",
+    "YARN_WRAP_OUTPUT": "false",
+    "PROXYCHAINS_QUIET_MODE": "1",
+    "XDG_SESSION_CLASS": "user",
+    "TERM": "xterm-256color",
+    "npm_package_name": "TeleParen",
+    "npm_package_dependencies__types_node": "^12.7.1",
+    "npm_package_scripts_start_paren": "ts-node-dev --respawn --transpileOnly src/paren.ts",
+    "USER": "sakiiily",
+    "COLORFGBG": "15;0",
+    "KDE_SESSION_VERSION": "5",
+    "PAM_KWALLET5_LOGIN": "/run/user/1000/kwallet5.socket",
+    "PROXYCHAINS_CONF_FILE": "/etc/proxychains.conf",
+    "npm_package_author_email": "sakiiily@aosc.io",
+    "DISPLAY": ":0",
+    "npm_package_dependencies__types_axios": "^0.14.0",
+    "npm_lifecycle_event": "start_botClient",
+    "SHLVL": "2",
+    "npm_config_version_git_sign": "",
+    "NVM_CD_FLAGS": "",
+    "INPUTRC": "/etc/inputrc",
+    "npm_config_version_git_message": "v%s",
+    "npm_package_scripts_start_botClient": "ts-node-dev --respawn --transpileOnly src/botClient.ts",
+    "QT_IM_MODULE": "fcitx5",
+    "LC_MEASUREMENT": "C",
+    "XDG_VTNR": "1",
+    "XDG_SESSION_ID": "4",
+    "npm_config_user_agent": "yarn/1.17.3 npm/? node/v12.3.0 linux x64",
+    "GS_LIB": "/home/sakiiily/.fonts",
+    "npm_package_dependencies__typescript_eslint_parser": "^2.0.0",
+    "npm_execpath": "/usr/lib/node_modules/yarn/bin/yarn.js",
+    "MOZ_PLUGIN_PATH": "/usr/lib/mozilla/plugins",
+    "XDG_RUNTIME_DIR": "/run/user/1000",
+    "JAVA_FONTS": "/usr/share/fonts",
+    "npm_config_strict_ssl": "true",
+    "LC_TIME": "C",
+    "npm_package_dependencies_typescript": "^3.5.3",
+    "QT_AUTO_SCREEN_SCALE_FACTOR": "0",
+    "LC_COLLATE": "C",
+    "XCURSOR_THEME": "breeze_cursors",
+    "XDG_DATA_DIRS": "/home/sakiiily/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/share:/usr/share:/usr/local/share",
+    "KDE_FULL_SESSION": "true",
+    "PATH": "/tmp/yarn--1566736081934-0.45019188533488674:/home/sakiiily/TeleParen/node_modules/.bin:/home/sakiiily/.config/yarn/link/node_modules/.bin:/home/sakiiily/.yarn/bin:/home/sakiiily/.nvm/versions/node/v12.3.0/libexec/lib/node_modules/npm/bin/node-gyp-bin:/home/sakiiily/.nvm/versions/node/v12.3.0/lib/node_modules/npm/bin/node-gyp-bin:/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node_modules/npm/bin/node-gyp-bin:/home/sakiiily/.nvm/versions/node/v12.3.0/bin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/opt/32/bin:/usr/dt/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/sakiiily/.gem/ruby/2.5.0/bin:/usr/dt/bin",
+    "KONSOLE_PROFILE_NAME": "Profile 1",
+    "HISTFILESIZE": "4096",
+    "npm_package_author_name": "eatradish",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+    "npm_package_license": "MIT",
+    "NVM_BIN": "/home/sakiiily/.nvm/versions/node/v12.3.0/bin",
+    "MAIL": "/var/spool/mail/sakiiily",
+    "npm_config_registry": "https://registry.yarnpkg.com",
+    "_JAVA_OPTIONS": "-Dawt.useSystemAAFontSettings=on",
+    "npm_config_ignore_optional": "",
+    "npm_node_execpath": "/home/sakiiily/.nvm/versions/node/v12.3.0/bin/node",
+    "LC_NUMERIC": "C",
+    "OLDPWD": "/home/sakiiily/TeleParen/src",
+    "npm_config_init_version": "1.0.0",
+    "NODE_ENV": "development"
+  },
+  "userLimits": {
+    "core_file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "data_seg_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_locked_memory_bytes": {
+      "soft": 65536,
+      "hard": 65536
+    },
+    "max_memory_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "open_files": {
+      "soft": 524288,
+      "hard": 524288
+    },
+    "stack_size_bytes": {
+      "soft": 8388608,
+      "hard": "unlimited"
+    },
+    "cpu_time_seconds": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_user_processes": {
+      "soft": 31436,
+      "hard": 31436
+    },
+    "virtual_memory_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    }
+  },
+  "sharedObjects": [
+    "linux-vdso.so.1",
+    "/usr/lib/libproxychains4.so",
+    "/usr/lib/libdl.so.2",
+    "/usr/lib/librt.so.1",
+    "/usr/lib/libstdc++.so.6",
+    "/usr/lib/libm.so.6",
+    "/usr/lib/libgcc_s.so.1",
+    "/usr/lib/libpthread.so.0",
+    "/usr/lib/libc.so.6",
+    "/lib64/ld-linux-x86-64.so.2"
+  ]
+}

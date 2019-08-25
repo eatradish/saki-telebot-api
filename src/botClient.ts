@@ -1,5 +1,6 @@
-import Bot, { BotDateResultMessage, BotDateResultChannelPost } from './api/bot';
+import Bot, { BotDateResultMessage, BotDateResultChannelPost, BotDate } from './api/bot';
 import token from '../settings';
+import * as readline from 'readline';
 
 const main = (): void => {
     const bot = new Bot(token.botClient);
@@ -19,6 +20,32 @@ const main = (): void => {
         }
     });
     bot.listen();
+
+    const send = async (): Promise<void> => {
+        let result: BotDate
+        const map = await bot.getUserList();
+        console.log(map);
+        const r = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+        r.setPrompt('>');
+        r.on('line', async (input) => {
+            const data = input.split(' ');
+            const id = Number(data[0])
+            const text = data.splice(-1, 1).join('');
+            if (id !== undefined && id !== NaN) result = await bot.sendMessage(id, text);
+            if (result !== undefined) console.log('You: ' + result);
+        });
+        /*r.question('sendMessage: (id text) ', async (input) => {
+            const data = input.split(' ');
+            const id = Number(data[0])
+            const text = data.splice(0, 1).join('');
+            console.log(id, text);
+            if (id !== undefined && id !== NaN) bot.sendMessage(id, text);
+        });*/
+    }
+   send();
 }
 
 main();
