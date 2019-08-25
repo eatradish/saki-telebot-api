@@ -1,28 +1,29 @@
-import Bot, { BotDateResultMessage, BotDateResultChannelPost, BotDate } from './api/bot';
+import Bot from './api/bot';
+import * as BotAPI from './api/bot_interface';
 import token from '../settings';
 import * as readline from 'readline';
 
 const main = async (): Promise<void> => {
     const bot = new Bot(token.botClient);
-    bot.on(/.*/, (msg: BotDateResultMessage | BotDateResultChannelPost) => {
+    bot.on(/.*/, (msg: BotAPI.BotGetUpdatesMessage | BotAPI.BotGetUpdatesChannelPost) => {
         let a: string;
         const type = msg.chat.type;
         if (type == 'group' || type == 'supergroup' || type == 'private') {
-            msg = msg as BotDateResultMessage;
+            msg = msg as BotAPI.BotGetUpdatesMessage;
             if (type == 'group' || type == 'supergroup') a = msg.chat.title;
             else a = 'private';
             console.log('> (' + a + ') ' + msg.from.username + ' (' +
                 msg.from.first_name + ' ' + msg.from.last_name + '): ' + msg.text);
         }
         else {
-            msg = msg as BotDateResultChannelPost;
+            msg = msg as BotAPI.BotGetUpdatesChannelPost;
             console.log('> (' + msg.chat.title + '): ' + msg.text);
         }
     });
     bot.listen();
 
     const send = (map: Map<number, string>): void => {
-        let result: BotDate
+        let result: BotAPI.BotSendMessage;
         console.log(map);
         const r = readline.createInterface({
             input: process.stdin,
@@ -34,15 +35,8 @@ const main = async (): Promise<void> => {
             const id = Number(data[0])
             const text = data.splice(-1, 1).join('');
             if (id !== undefined && id !== NaN) result = await bot.sendMessage(id, text);
-            if (result !== undefined) console.log('You: ' + result.result);
+            if (result !== undefined) console.log('You: ' + result.result.text);
         });
-        /*r.question('sendMessage: (id text) ', async (input) => {
-            const data = input.split(' ');
-            const id = Number(data[0])
-            const text = data.splice(0, 1).join('');
-            console.log(id, text);
-            if (id !== undefined && id !== NaN) bot.sendMessage(id, text);
-        });*/
     }
     const map = await bot.getUserList()
     send(map);

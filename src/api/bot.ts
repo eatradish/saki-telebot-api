@@ -1,57 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { isRegExp, isString } from 'util';
-
-export interface BotDate {
-    ok: boolean;
-    result: BotDateResult[];
-}
-
-export interface BotDateResult {
-    update_id: number;
-    message?: BotDateResultMessage;
-    channel_post?: BotDateResultChannelPost;
-    edited_message?: {};
-}
-
-export interface BotDateResultMessage {
-    message_id: number;
-    from: BotDateResultMessageFrom;
-    chat: BotDateResultMessageChat;
-    date: number;
-    text: string;
-}
-
-export interface BotDateResultMessageChat {
-    id: number;
-    first_name: string;
-    last_name: string;
-    username: string;
-    type: string;
-    title?: string;
-}
-
-export interface BotDateResultMessageFrom {
-    id: number;
-    is_bot: boolean;
-    first_name: string;
-    last_name: string;
-    username: string;
-    language_code: string;
-}
-
-export interface BotDateResultChannelPost {
-    message_id: number;
-    chat: BotDateResultChannelPostChat;
-    data: number;
-    text: string;
-}
-
-export interface BotDateResultChannelPostChat {
-    id: number;
-    title: string;
-    username: string;
-    type: string;
-}
+import  * as BotAPI from './bot_interface';
 
 class Bot {
     private readonly requester: AxiosInstance;
@@ -64,7 +13,7 @@ class Bot {
         this.funcs = new Map<RegExp | string | string[], Function>();
         this.time = time;
     }
-    public async sendMessage(chat_id: number, text: string): Promise<BotDate> {
+    public async sendMessage(chat_id: number, text: string): Promise<BotAPI.BotSendMessage> {
         const res = await this.requester.post('/sendMessage', {
             chat_id,
             text,
@@ -72,7 +21,7 @@ class Bot {
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/sendMessage failed");
     }
-    public async getUpdates(offset?: number): Promise<BotDate> {
+    public async getUpdates(offset?: number): Promise<BotAPI.BotGetUpdates> {
         const res = await this.requester.post('/getUpdates', {
             offset,
         });
@@ -88,7 +37,7 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg: BotDateResultMessage | BotDateResultChannelPost;
+            let msg: BotAPI.BotGetUpdatesMessage | BotAPI.BotGetUpdatesChannelPost;
             let data = await this.getUpdates();
             if (data.result.length === 100) {
                 data = await this.getUpdates(data.result[50].update_id);
