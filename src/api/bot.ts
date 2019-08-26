@@ -43,9 +43,9 @@ class Bot {
                 data = await this.getUpdates(data.result[99].update_id);
             }
             const newDate = data.result[data.result.length - 1];
-            if (newDate.message !== undefined) msg = data.result[data.result.length - 1].message;
-            else if (newDate.channel_post !== undefined) msg = data.result[data.result.length - 1].channel_post
-            else if (newDate.edited_message !== undefined) msg = data.result[data.result.length - 1].edited_message;
+            if (newDate.message !== undefined) msg = newDate.message;
+            else if (newDate.channel_post !== undefined) msg = newDate.channel_post
+            else if (newDate.edited_message !== undefined) msg = newDate.edited_message;
             update_id = data.result[data.result.length - 1].update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
             if (data.ok && data.result) {
