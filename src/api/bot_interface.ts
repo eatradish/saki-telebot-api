@@ -20,7 +20,13 @@ export interface BotGetUpdatesResult {
     update_id: number;
     message?: BotGetUpdatesResultMessage;
     channel_post?: BotGetUpdatesResultChannelPost;
-    edited_message?: {};
+    edited_message?: BotGetUpdatesResultEditedMessage;
+}
+
+export interface BotGetUpdatesResultEditedMessage {
+    message_id: number;
+    from: BotGetUpdatesResultMessageFrom;
+    chat: BotGetUpdatesResultMessageChat;
 }
 
 export interface BotGetUpdatesResultMessage {
@@ -46,6 +52,7 @@ export interface BotGetUpdatesResultMessageChat {
     username: string;
     type: string;
     title?: string;
+    all_members_are_administrators?: boolean;
 }
 
 export interface BotGetUpdatesResultMessageFrom {

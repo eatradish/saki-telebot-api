@@ -14,6 +14,7 @@ const main = async (): Promise<void> => {
             else a = 'private';
             const s = '> (' + a + ') ' + msg.from.username + ' (' +
             msg.from.first_name + ' ' + msg.from.last_name + '): '
+            console.log(msg);
             if (msg.text) console.log(s + msg.text)
             else if (msg.photo) console.log(s + '[photo], file_id: ' + msg.photo[-1].file_id)
         }
