@@ -1,6 +1,6 @@
-import Bot from './api/bot';
-import * as BotAPI from './api/bot_interface';
-import token from '../settings';
+import Bot from '../api/bot';
+import * as BotAPI from '../api/bot_interface';
+import token from '../../settings';
 import * as readline from 'readline';
 
 const main = async (): Promise<void> => {
@@ -13,7 +13,7 @@ const main = async (): Promise<void> => {
         if (type == 'group' || type == 'supergroup' || type == 'private') {
             msg = msg as BotAPI.BotGetUpdatesResultMessage;
             if (type == 'group' || type == 'supergroup') a = 'group: ' + msg.chat.title;
-            else a = 'private: ';
+            else a = 'private';
             const s = '> (' + a + ') ' + msg.from.username + ' (' +
                 msg.from.first_name + ' ' + msg.from.last_name + '): ';
             if (msg.text) console.log(s + msg.text);

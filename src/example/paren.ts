@@ -1,5 +1,5 @@
-import Bot from './api/bot';
-import token from '../settings';
+import Bot from '../api/bot';
+import token from '../../settings';
 
 const paren = (str: string): string => {
     const left = '({<[（{《「';
