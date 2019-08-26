@@ -25,9 +25,7 @@ class Bot {
         const res = await this.requester.post('/getUpdates', {
             offset,
         });
-        if (res.status === 200 && res.data){
-            return res.data;
-        }
+        if (res.status === 200 && res.data) return res.data;
         else throw new Error("/getUpdates failed");
     }
     public async listen(): Promise<void> {
@@ -37,7 +35,7 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg: BotAPI.BotGetUpdatesMessage | BotAPI.BotGetUpdatesChannelPost;
+            let msg: BotAPI.BotGetUpdatesResultMessage | BotAPI.BotGetUpdatesResultChannelPost;
             let data = await this.getUpdates();
             if (data.result.length === 100) {
                 data = await this.getUpdates(data.result[99].update_id);
