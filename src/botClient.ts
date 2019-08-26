@@ -12,11 +12,10 @@ const main = async (): Promise<void> => {
             msg = msg as BotAPI.BotGetUpdatesResultMessage;
             if (type == 'group' || type == 'supergroup') a = msg.chat.title;
             else a = 'private';
-            if (msg.text) {
-                console.log('> (' + a + ') ' + msg.from.username + ' (' +
-                msg.from.first_name + ' ' + msg.from.last_name + '): ' + msg.text);
-            }
-            else console.log(msg);
+            const s = '> (' + a + ') ' + msg.from.username + ' (' +
+            msg.from.first_name + ' ' + msg.from.last_name + '): '
+            if (msg.text) console.log(s + msg.text)
+            else if (msg.photo) console.log(s + '[photo], file_id: ' + msg.photo[-1].file_id)
         }
         else {
             msg = msg as BotAPI.BotGetUpdatesResultChannelPost;
