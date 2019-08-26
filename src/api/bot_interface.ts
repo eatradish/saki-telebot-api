@@ -28,7 +28,15 @@ export interface BotGetUpdatesResultMessage {
     from: BotGetUpdatesResultMessageFrom;
     chat: BotGetUpdatesResultMessageChat;
     date: number;
-    text: string;
+    text?: string;
+    photo?: BotGetUpdatesResultMessagePhoto[];
+}
+
+export interface BotGetUpdatesResultMessagePhoto {
+    file_id: string;
+    file_size: number;
+    width: number;
+    height: number;
 }
 
 export interface BotGetUpdatesResultMessageChat {

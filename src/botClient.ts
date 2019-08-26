@@ -16,6 +16,7 @@ const main = async (): Promise<void> => {
                 console.log('> (' + a + ') ' + msg.from.username + ' (' +
                 msg.from.first_name + ' ' + msg.from.last_name + '): ' + msg.text);
             }
+            else console.log(msg);
         }
         else {
             msg = msg as BotAPI.BotGetUpdatesResultChannelPost;
