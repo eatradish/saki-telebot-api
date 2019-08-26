@@ -14,7 +14,6 @@ const main = async (): Promise<void> => {
             else a = 'private: ';
             const s = '> (' + a + ') ' + msg.from.username + ' (' +
                 msg.from.first_name + ' ' + msg.from.last_name + '): ';
-            console.log(msg)
             if (msg.text) console.log(s + msg.text);
             else if (msg.photo) {
                 const ss = s + '[photo], file_id: ' + msg.photo[msg.photo.length - 1].file_id;
@@ -22,12 +21,15 @@ const main = async (): Promise<void> => {
                 else console.log(ss);
             }
             else if (msg.sticker) console.log(s + '[sticker], emoji: ' + msg.sticker.emoji);
+            else return;
         }
         else {
             msg = msg as BotAPI.BotGetUpdatesResultChannelPost;
             const s = '> (' + msg.chat.title + '): ';
             if (msg.text) console.log(s + msg.text);
-
+            else if (msg.photo) console.log(s + '[photo]: ' + msg.photo[msg.photo.length - 1].file_id);
+            else if (msg.sticker) console.log(s + '[sticker]: ' + msg.sticker.emoji);
+            else return;
         }
     });
     bot.listen();

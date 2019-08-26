@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { isRegExp, isString } from 'util';
-import  * as BotAPI from './bot_interface';
+import * as BotAPI from './bot_interface';
 
 class Bot {
     private readonly requester: AxiosInstance;
@@ -35,7 +35,9 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg: BotAPI.BotGetUpdatesResultMessage | BotAPI.BotGetUpdatesResultChannelPost;
+            let msg: BotAPI.BotGetUpdatesResultMessage |
+                BotAPI.BotGetUpdatesResultChannelPost |
+                BotAPI.BotGetUpdatesResultEditedMessage;
             let data = await this.getUpdates();
             if (data.result.length === 100) {
                 data = await this.getUpdates(data.result[99].update_id);
@@ -43,14 +45,15 @@ class Bot {
             const newDate = data.result[data.result.length - 1];
             if (newDate.message !== undefined) msg = data.result[data.result.length - 1].message;
             else if (newDate.channel_post !== undefined) msg = data.result[data.result.length - 1].channel_post
+            else if (newDate.edited_message !== undefined) msg = data.result[data.result.length - 1].edited_message;
             update_id = data.result[data.result.length - 1].update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
             if (data.ok && data.result) {
                 if (update_id === new_update_id) {
                     this.funcs.forEach((cb, arg) => {
+                        const text = msg.text;
                         let match: RegExpExecArray;
                         let props: string[];
-                        const text = msg.text;
                         if (isRegExp(arg)) {
                             match = arg.exec(text);
                             if (match) props = match[0].split(' ');
@@ -85,7 +88,7 @@ class Bot {
         for (const index of data.result) {
             let type: string;
             if (index.channel_post) type = 'channel';
-            else if(index.edited_message) continue;
+            else if (index.edited_message) continue;
             else type = index.message.chat.type;
             if (type === 'group' || type === 'supergroup') {
                 name = index.message.chat.title;

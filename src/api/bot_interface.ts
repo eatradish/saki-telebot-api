@@ -27,6 +27,9 @@ export interface BotGetUpdatesResultEditedMessage {
     message_id: number;
     from: BotGetUpdatesResultMessageFrom;
     chat: BotGetUpdatesResultMessageChat;
+    date: number;
+    edit_date: number;
+    text: string;
 }
 
 export interface BotGetUpdatesResultMessage {
@@ -37,6 +40,7 @@ export interface BotGetUpdatesResultMessage {
     text?: string;
     photo?: BotGetUpdatesResultMessagePhoto[];
     sticker?: BotGetUpdatesResultMessageSticker;
+    caption?: string;
 }
 
 export interface BotGetUpdatesResultMessageSticker {
@@ -80,7 +84,9 @@ export interface BotGetUpdatesResultChannelPost {
     message_id: number;
     chat: BotGetUpdatesResultChannelPostChat;
     data: number;
-    text: string;
+    text?: string;
+    photo?: BotGetUpdatesResultMessagePhoto[];
+    sticker?: BotGetUpdatesResultMessageSticker;
 }
 
 export interface BotGetUpdatesResultChannelPostChat {
