@@ -76,8 +76,8 @@ const treehole = async (): Promise<void> => {
         const resp = await axios.get('http://jandan.net/treehole');
         if (resp.status === 200 && resp.data) {
             const list = parser(resp.data);
-            const newLastDataId = list[list.length - 1];
-            if (lastDataId === undefined) lastDataId = list[list.length - 1];
+            const newLastDataId = list[list.length - 1].id;
+            if (lastDataId === undefined) lastDataId = list[list.length - 1].id;
             if (lastDataId < newLastDataId) {
                 bot.sendMessage(-1001366200257, 
                     list[list.length - 1].username + ': ' + list[list.length - 1].text);
