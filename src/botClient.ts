@@ -10,17 +10,22 @@ const main = async (): Promise<void> => {
         const type = msg.chat.type;
         if (type == 'group' || type == 'supergroup' || type == 'private') {
             msg = msg as BotAPI.BotGetUpdatesResultMessage;
-            if (type == 'group' || type == 'supergroup') a = msg.chat.title;
-            else a = 'private';
+            if (type == 'group' || type == 'supergroup') a = 'group: ' + msg.chat.title;
+            else a = 'private: ';
             const s = '> (' + a + ') ' + msg.from.username + ' (' +
-            msg.from.first_name + ' ' + msg.from.last_name + '): ';
+                msg.from.first_name + ' ' + msg.from.last_name + '): ';
+            console.log(msg)
             if (msg.text) console.log(s + msg.text);
-            else if (msg.photo) console.log(s + '[photo], file_id: ' + msg.photo[msg.photo.length - 1].file_id);
+            else if (msg.photo) {
+                const ss = s + '[photo], file_id: ' + msg.photo[msg.photo.length - 1].file_id;
+                if (msg.caption !== undefined) console.log(ss + ', text: ' + msg.caption);
+                else console.log(ss);
+            }
             else if (msg.sticker) console.log(s + '[sticker], emoji: ' + msg.sticker.emoji);
         }
         else {
             msg = msg as BotAPI.BotGetUpdatesResultChannelPost;
-            const s ='> (' + msg.chat.title + '): ';
+            const s = '> (' + msg.chat.title + '): ';
             if (msg.text) console.log(s + msg.text);
 
         }
@@ -34,13 +39,13 @@ const main = async (): Promise<void> => {
             input: process.stdin,
             output: process.stdout,
         });
-        r.setPrompt('>');
+        r.setPrompt('send>>> ');
         r.on('line', async (input) => {
             const data = input.split(', ');
             const id = Number(data[0])
             const text = data.splice(-1, 1).join('');
             if (id !== undefined && id !== NaN) result = await bot.sendMessage(id, text);
-            if (result !== undefined) console.log('to ' + map.get(id) + ': '+ result.result.text);
+            if (result !== undefined) console.log('to ' + map.get(id) + ': ' + result.result.text);
         });
     }
     const map = await bot.getUserList();
