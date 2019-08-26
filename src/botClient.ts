@@ -16,10 +16,13 @@ const main = async (): Promise<void> => {
             msg.from.first_name + ' ' + msg.from.last_name + '): ';
             if (msg.text) console.log(s + msg.text);
             else if (msg.photo) console.log(s + '[photo], file_id: ' + msg.photo[msg.photo.length - 1].file_id);
+            else if (msg.sticker) console.log(s + '[sticker], emoji: ' + msg.sticker.emoji);
         }
         else {
             msg = msg as BotAPI.BotGetUpdatesResultChannelPost;
-            if (msg.text) console.log('> (' + msg.chat.title + '): ' + msg.text);
+            const s ='> (' + msg.chat.title + '): ';
+            if (msg.text) console.log(s + msg.text);
+
         }
     });
     bot.listen();

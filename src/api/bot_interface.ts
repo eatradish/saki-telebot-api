@@ -36,6 +36,18 @@ export interface BotGetUpdatesResultMessage {
     date: number;
     text?: string;
     photo?: BotGetUpdatesResultMessagePhoto[];
+    sticker?: BotGetUpdatesResultMessageSticker;
+}
+
+export interface BotGetUpdatesResultMessageSticker {
+    width: number;
+    height: number;
+    emoji: string;
+    set_name: string;
+    is_animated: boolean;
+    thumb: BotGetUpdatesResultMessagePhoto;
+    file_id: string;
+    file_size: number;
 }
 
 export interface BotGetUpdatesResultMessagePhoto {
