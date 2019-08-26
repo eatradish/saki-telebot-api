@@ -5,7 +5,9 @@ import * as readline from 'readline';
 
 const main = async (): Promise<void> => {
     const bot = new Bot(token.botClient);
-    bot.on(/.*/, (msg: BotAPI.BotGetUpdatesResultMessage | BotAPI.BotGetUpdatesResultChannelPost) => {
+    bot.on(/.*/, (msg: BotAPI.BotGetUpdatesResultMessage |
+        BotAPI.BotGetUpdatesResultChannelPost |
+        BotAPI.BotGetUpdatesResultEditedMessage) => {
         let a: string;
         const type = msg.chat.type;
         if (type == 'group' || type == 'supergroup' || type == 'private') {
