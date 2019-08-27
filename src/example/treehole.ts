@@ -8,67 +8,57 @@ interface TreeHoleItem {
     username: string;
     text: string;
 }
-//这里的 parser 使用了两种 parse 方法获得信息，非常糟糕的方法，求提供一些建议
+
 const parser = (needParse: string): TreeHoleItem[] => {
     const che = Cheerio.load(needParse);
     const html = che.html();
-    const parseList = html.split("</div>");
-    const parseList2 = html.split("\n");
-    let start;
-    let start2;
-    for (let i = 0; i < parseList.length; i++) {
-        const isStart = parseList[i].indexOf('<ol class="commentlist" style="list-style-type: none;">') !== -1;
-        if (isStart) start = i;
-    }
-    for (let i = 0; i < parseList2.length; i++) {
-        const isStart2 = parseList2[i].indexOf('<ol class="commentlist" style="list-style-type: none;">') !== -1;
-        if (isStart2) start2 = i;
-    }
-
-    const tempList = [];
+    const parseList = html.split("\n");
+    const startStr = '<ol class="commentlist" style="list-style-type: none;">';
+    const endStr = '<div class="cp-pagenavi">';
+    let start, end;
+    let tempList = [];
     const resList = [];
-    let data;
-    const ids = [];
-    for (let i = start2; i < parseList2.length; i++) {
-        if (parseList2[i].indexOf('<div class="cp-pagenavi">') !== -1) break;
-        if (parseList2[i].indexOf('<li id="comment-') !== -1) {
-            data = parseList2[i].replace('<li id="comment-', '');
-            data = data.replace('">', '');
-            ids.push(data);
-        }
+    for (let i = 0; i < parseList.length; i++) {
+        if (parseList[i].indexOf(startStr) !== -1) start = i;
+        else if (parseList[i].indexOf(endStr) !== -1) end = i;
     }
-    for (let i = start; i < parseList.length; i++) {
-        if (parseList[i].indexOf('<div class="cp-pagenavi">') !== -1) break;
-        let cheItemText = Cheerio.load(parseList[i]).text();
-        if (cheItemText !== '' &&
-            cheItemText !== '[举报]' &&
-            cheItemText.indexOf('吐槽 [') === -1 &&
-            cheItemText.indexOf('OO [') === -1 &&
-            cheItemText.indexOf('XX [') === -1) {
-            for (const i of ids) {
-                if (cheItemText.indexOf(i) !== -1) {
-                    cheItemText = cheItemText.replace(i, '');
-                    break;
-                }
-            }
-            tempList.push(cheItemText);
+    for (let i = start + 1; i < end; i++) {
+        tempList.push(parseList[i]);
+    }
+    let i = tempList.length - 1;
+    while (i >= 0) {
+        if (tempList[i].indexOf('</ol>') === -1) {
+            tempList.splice(i, 1);
+            i -= 1;
         }
+        else break;
+    }
+    tempList.pop();
+    tempList = tempList.join('\n').split('</li>');
+    const ids = [];
+    const tempList2 = [];
+    for (let i = 0; i < tempList.length; i++) {
+        tempList[i] += '</li>';
+        const id = cheerio('li', tempList[i]).attr('id').replace('comment-', '');
+        ids.push(id);
+    }
+    for (let i = 0; i < tempList.length; i++) {
+        tempList2.push(cheerio.load(tempList[i]).text().replace(ids[i], ''));
     }
     for (let i = 0; i < ids.length; i++) {
-        const id = Number(ids[i]);
-        const username = tempList[i * 2];
-        const text = tempList[2 * i + 1];
-        const treehole_item = {
-            id, username, text
+        const treeHoleItemObj = {
+            id: Number(ids[i]),
+            username: tempList2[i * 2],
+            text: tempList2[2 * i + 1],
         } as TreeHoleItem;
-        resList.push(treehole_item);
+        resList.push(treeHoleItemObj);
     }
     return resList;
 }
 
 const treehole = async (): Promise<void> => {
     const bot = new Bot(token.treehold);
-    let lastDataId;
+    let lastDataId: number;
     const sleep = ((time: number): Promise<NodeJS.Timeout> => {
         return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
     });
@@ -79,7 +69,7 @@ const treehole = async (): Promise<void> => {
             const newLastDataId = list[0].id;
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
-                bot.sendMessage(-1001292615621, 
+                bot.sendMessage(-1001292615621,
                     list[0].username + ': ' + list[0].text);
                 lastDataId = newLastDataId;
             }
