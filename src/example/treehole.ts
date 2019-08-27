@@ -43,7 +43,14 @@ const parser = (needParse: string): TreeHoleItem[] => {
         ids.push(id);
     }
     for (let i = 0; i < tempList.length; i++) {
-        tempList2.push(cheerio.load(tempList[i]).text().replace(ids[i], ''));
+        const cheItemText = cheerio.load(tempList[i]).text().replace(ids[i], '');
+        if (cheItemText !== '' &&
+            cheItemText !== '[举报]' &&
+            cheItemText.indexOf('吐槽 [') === -1 &&
+            cheItemText.indexOf('OO [') === -1 &&
+            cheItemText.indexOf('XX [') === -1) {
+            tempList2.push(cheItemText);
+        }
     }
     for (let i = 0; i < ids.length; i++) {
         const treeHoleItemObj = {
