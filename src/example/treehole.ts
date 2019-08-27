@@ -8,6 +8,7 @@ interface TreeHoleItem {
     username: string;
     text: string;
 }
+//这里的 parser 使用了两种 parse 方法获得信息，非常糟糕的方法，求提供一些建议
 const parser = (needParse: string): TreeHoleItem[] => {
     const che = Cheerio.load(needParse);
     const html = che.html();
@@ -16,7 +17,6 @@ const parser = (needParse: string): TreeHoleItem[] => {
     let start;
     let start2;
     for (let i = 0; i < parseList.length; i++) {
-        /*if (parseList[i] !== '') parseList[i] = parseList[i] + '</div>';*/
         const isStart = parseList[i].indexOf('<ol class="commentlist" style="list-style-type: none;">') !== -1;
         if (isStart) start = i;
     }
@@ -79,7 +79,7 @@ const treehole = async (): Promise<void> => {
             const newLastDataId = list[0].id;
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
-                bot.sendMessage(-1001366200257, 
+                bot.sendMessage(-1001292615621, 
                     list[0].username + ': ' + list[0].text);
                 lastDataId = newLastDataId;
             }
