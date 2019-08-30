@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { isRegExp, isString } from 'util';
 import * as BotAPI from './bot_interface';
+import * as BotGetUpdatesResult from './message';
 
 class Bot {
     private readonly requester: AxiosInstance;
@@ -9,24 +10,53 @@ class Bot {
     public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
         this.requester = axios.create({
             baseURL: url + token,
+            timeout: 5000,
         });
         this.funcs = new Map<RegExp | string | string[], Function>();
         this.time = time;
     }
-    public async sendMessage(chat_id: number, text: string): Promise<BotAPI.BotSendMessage> {
+    public async sendMessage(chat_id: number, text: string, Option?: BotAPI.BotOptionSendMessage):
+        Promise<BotAPI.BotSendMessage> {
         const res = await this.requester.post('/sendMessage', {
             chat_id,
             text,
+            parse_mode: Option.parse_mode,
+            disable_web_page_preview: Option.disable_web_page_preview,
+            disable_notification: Option.disable_notification,
+            reply_to_message_id: Option.reply_to_message_id,
+            reply_markup: Option.reply_markup,
         });
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/sendMessage failed");
     }
-    public async getUpdates(offset?: number): Promise<BotAPI.BotGetUpdates> {
+    public async getUpdates(Option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
         const res = await this.requester.post('/getUpdates', {
-            offset,
+            offset: Option.offset,
+            limit: Option.limit,
+            timeout: Option.timeout,
+            allow_updates: Option.allowed_updates,
         });
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/getUpdates failed");
+    }
+    public async execFuncs(msg: BotAPI.BotGetUpdatesResultMessage |
+        BotAPI.BotGetUpdatesResultChannelPost |
+        BotAPI.BotGetUpdatesResultEditedMessage): Promise<void> {
+        this.funcs.forEach((cb, arg) => {
+            const text = msg.text;
+            let match: RegExpExecArray;
+            let props: string[];
+            if (isRegExp(arg)) {
+                match = arg.exec(text);
+                if (match) props = match[0].split(' ');
+            }
+            else if (isString(arg) && text.split(' ')[0] === arg) props = text.split(' ');
+            else {
+                props = text.split(' ');
+                if (arg.indexOf(props[0]) === -1) return;
+            }
+            cb(msg, props);
+        });
     }
     public async listen(): Promise<void> {
         let update_id: number;
@@ -35,41 +65,42 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg: BotAPI.BotGetUpdatesResultMessage |
-                BotAPI.BotGetUpdatesResultChannelPost |
-                BotAPI.BotGetUpdatesResultEditedMessage;
-            let data = await this.getUpdates();
+            let msg;
+            let data: BotAPI.BotGetUpdates;
+            try {
+                data = await this.getUpdates();
+            }
+            catch (err) {
+                console.log(err);
+                continue;
+            }
             if (data.result.length === 100) {
-                data = await this.getUpdates(data.result[99].update_id);
+                try {
+                    data = await this.getUpdates({ offset: data.result[99].update_id } as BotAPI.BotOptionGetUpdates);
+                }
+                catch (err) {
+                    console.log(err);
+                    continue;
+                }
             }
             const newDate = data.result[data.result.length - 1];
-            if (newDate.message !== undefined) msg = newDate.message;
-            else if (newDate.channel_post !== undefined) msg = newDate.channel_post
-            else if (newDate.edited_message !== undefined) msg = newDate.edited_message;
+            if (newDate.message !== undefined) {
+                msg = newDate.message;
+                msg = new BotGetUpdatesResult.Message(msg, this);
+            }
+            else if (newDate.channel_post !== undefined) {
+                msg = newDate.channel_post;
+                msg = new BotGetUpdatesResult.ChannelPost(msg, this);
+            }
+            else if (newDate.edited_message !== undefined) {
+                msg = newDate.edited_message;
+                msg = new BotGetUpdatesResult.EditedMessage(msg, this);
+            }
             update_id = data.result[data.result.length - 1].update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
             if (data.ok && data.result) {
                 if (update_id === new_update_id) {
-                    this.funcs.forEach((cb, arg) => {
-                        const text = msg.text;
-                        let match: RegExpExecArray;
-                        let props: string[];
-                        if (isRegExp(arg)) {
-                            match = arg.exec(text);
-                            if (match) props = match[0].split(' ');
-                            cb(msg, props)
-                        }
-                        else if (isString(arg)) {
-                            if (text.split(' ')[0] === arg) {
-                                props = text.split(' ');
-                                cb(msg, props);
-                            }
-                        }
-                        else {
-                            props = text.split(' ');
-                            if (arg.indexOf(props[0]) !== -1) cb(msg, props);
-                        }
-                    });
+                    this.execFuncs(msg);
                     new_update_id += 1;
                 }
             }

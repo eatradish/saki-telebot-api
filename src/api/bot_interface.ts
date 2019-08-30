@@ -8,6 +8,21 @@ export interface BotSendMessage {
     result: BotSendMessageResult;
 }
 
+export interface BotOptionSendMessage {
+    parse_mode?: string;
+    disable_web_page_preview?: boolean;
+    disable_notification?: boolean;
+    reply_to_message_id?: number;
+    reply_markup?: {};
+}
+
+export interface BotOptionGetUpdates {
+    offset?: number;
+    limit?: number;
+    timeout?: number;
+    allowed_updates: string[];
+}
+
 export interface BotSendMessageResult {
     message_id: boolean;
     from: BotGetUpdatesResultMessageFrom;
@@ -87,6 +102,7 @@ export interface BotGetUpdatesResultChannelPost {
     text?: string;
     photo?: BotGetUpdatesResultMessagePhoto[];
     sticker?: BotGetUpdatesResultMessageSticker;
+    caption?: string;
 }
 
 export interface BotGetUpdatesResultChannelPostChat {

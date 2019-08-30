@@ -15,14 +15,14 @@ const parser = (needParse: string): TreeHoleItem[] => {
     const parseList = html.split("\n");
     const startStr = '<ol class="commentlist" style="list-style-type: none;">';
     const endStr = '<div class="cp-pagenavi">';
-    let start, end;
-    let tempList = [];
-    const resList = [];
+    let start, end: number;
+    let tempList: string[] = [];
+    const resList: TreeHoleItem[] = [];
     for (let i = 0; i < parseList.length; i++) {
         if (parseList[i].indexOf(startStr) !== -1) start = i;
         else if (parseList[i].indexOf(endStr) !== -1) end = i;
     }
-    for (let i = start + 1; i < end; i++) {
+    for (let i = start + 1; i < end - 1; i++) {
         tempList.push(parseList[i]);
     }
     let i = tempList.length - 1;
@@ -41,8 +41,6 @@ const parser = (needParse: string): TreeHoleItem[] => {
         tempList[i] += '</li>';
         const id = cheerio('li', tempList[i]).attr('id').replace('comment-', '');
         ids.push(id);
-    }
-    for (let i = 0; i < tempList.length; i++) {
         const cheItemText = cheerio.load(tempList[i]).text().replace(ids[i], '');
         if (cheItemText !== '' &&
             cheItemText !== '[举报]' &&
@@ -77,7 +75,7 @@ const treehole = async (): Promise<void> => {
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
                 bot.sendMessage(-1001292615621,
-                    list[0].username + ': ' + list[0].text);
+                    list[0].username + list[0].text);
                 lastDataId = newLastDataId;
             }
         }
