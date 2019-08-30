@@ -54,6 +54,44 @@ class Bot {
             cb(msg, props);
         });
     }
+    public async getMsg(): Promise<BotAPI.BotGetUpdates> {
+        let data: BotAPI.BotGetUpdates;
+        try {
+            data = await this.getUpdates();
+        }
+        catch (err) {
+            console.log(err);
+        }
+        if (data.result.length === 100) {
+            try {
+                data = await this.getUpdates({ offset: data.result[99].update_id } as BotAPI.BotOptionGetUpdates);
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+        return data;
+    }
+    public getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
+        let msg;
+        const newDate = data.result[data.result.length - 1];
+        if (newDate.message !== undefined) {
+            msg = newDate.message;
+            msg = new BotGetUpdatesResult.Message(msg, this);
+        }
+        else if (newDate.channel_post !== undefined) {
+            msg = newDate.channel_post;
+            msg = new BotGetUpdatesResult.ChannelPost(msg, this);
+        }
+        else if (newDate.edited_message !== undefined) {
+            msg = newDate.edited_message;
+            msg = new BotGetUpdatesResult.EditedMessage(msg, this);
+        }
+        return {
+            msg,
+            update_id: newDate.update_id,
+        };
+    }
     public async listen(): Promise<void> {
         let update_id: number;
         let new_update_id: undefined | number;
@@ -61,42 +99,13 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg;
-            let data: BotAPI.BotGetUpdates;
-            try {
-                data = await this.getUpdates();
-            }
-            catch (err) {
-                console.log(err);
-                continue;
-            }
-            if (data.result.length === 100) {
-                try {
-                    data = await this.getUpdates({ offset: data.result[99].update_id } as BotAPI.BotOptionGetUpdates );
-                }
-                catch (err) {
-                    console.log(err);
-                    continue;
-                }
-            }
-            const newDate = data.result[data.result.length - 1];
-            if (newDate.message !== undefined) {
-                msg = newDate.message;
-                msg = new BotGetUpdatesResult.Message(msg, this);
-            }
-            else if (newDate.channel_post !== undefined) {
-                msg = newDate.channel_post;
-                msg = new BotGetUpdatesResult.ChannelPost(msg, this);
-            }
-            else if (newDate.edited_message !== undefined) {
-                msg = newDate.edited_message;
-                msg = new BotGetUpdatesResult.EditedMessage(msg, this);
-            }
-            update_id = data.result[data.result.length - 1].update_id;
+            const data = await this.getMsg();
+            const lastData = this.getLastMsg(data);
+            update_id = lastData.update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
             if (data.ok && data.result) {
                 if (update_id === new_update_id) {
-                    this.execFuncs(msg);
+                    this.execFuncs(lastData.msg);
                     new_update_id += 1;
                 }
             }
@@ -106,7 +115,6 @@ class Bot {
     public on(match: RegExp | string | string[], cb: Function): void {
         this.funcs.set(match, cb);
     }
-
     public async getUserList(): Promise<Map<number, string> | undefined> {
         const data = await this.getUpdates();
         const map = new Map<number, string>();

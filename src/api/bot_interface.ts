@@ -111,3 +111,8 @@ export interface BotGetUpdatesResultChannelPostChat {
     username: string;
     type: string;
 }
+
+export interface GetLastMsg {
+    msg: BotGetUpdatesResultMessage | BotGetUpdatesResultEditedMessage | BotGetUpdatesResultChannelPost;
+    update_id: number;
+}
