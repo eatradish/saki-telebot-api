@@ -3,6 +3,7 @@ import * as BotAPI from '../api/bot_interface';
 import token from '../../settings';
 import * as readline from 'readline';
 import { Message } from '../api/message';
+import { isNumber } from 'util';
 
 const main = async (): Promise<void> => {
     const bot = new Bot(token.botClient);
@@ -40,18 +41,22 @@ const main = async (): Promise<void> => {
 
     const send = (map: Map<number, string>): void => {
         let result: BotAPI.BotSendMessage;
-        console.log(map);
         const r = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
         });
-        r.setPrompt('send>>> ');
+        r.setPrompt('>>> ');
         r.on('line', async (input) => {
-            const data = input.split(', ');
-            const id = Number(data[0])
-            const text = data.splice(-1, 1).join('');
-            if (id !== undefined && id !== NaN) result = await bot.sendMessage(id, text);
-            if (result !== undefined) console.log('to ' + map.get(id) + ': ' + result.result.text);
+            let arg = input.split(' ');
+            const command = arg[0];
+            if (command === 'text') {
+                const id = Number(arg[1]);
+                arg = arg.splice(-1, 2);
+                const data = arg.join('');
+                if (isNumber(id) && id !== NaN) result = await bot.sendMessage(id, data);
+                if (result !== undefined) console.log('to ' + map.get(id) + ': ' + result.result.text);
+            }
+            else if (command === 'list') console.log(map);
         });
     }
     const map = await bot.getUserList();
