@@ -61,7 +61,7 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg: any;
+            let msg;
             let data: BotAPI.BotGetUpdates;
             try {
                 data = await this.getUpdates();

@@ -2,6 +2,7 @@ import Bot from '../api/bot';
 import * as BotAPI from '../api/bot_interface';
 import token from '../../settings';
 import * as readline from 'readline';
+import { Message } from '../api/message';
 
 const main = async (): Promise<void> => {
     const bot = new Bot(token.botClient);
@@ -34,6 +35,7 @@ const main = async (): Promise<void> => {
             else return;
         }
     });
+    bot.on('/start', (msg: Message) => msg.replyText('咸鱼叫，咸鱼叫，咸鱼被吃掉！'));
     bot.listen();
 
     const send = (map: Map<number, string>): void => {
