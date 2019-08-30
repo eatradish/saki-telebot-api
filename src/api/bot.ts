@@ -17,25 +17,21 @@ class Bot {
     }
     public async sendMessage(chat_id: number, text: string, Option?: BotAPI.BotOptionSendMessage):
         Promise<BotAPI.BotSendMessage> {
-        const res = await this.requester.post('/sendMessage', {
-            chat_id,
-            text,
-            parse_mode: Option.parse_mode,
-            disable_web_page_preview: Option.disable_web_page_preview,
-            disable_notification: Option.disable_notification,
-            reply_to_message_id: Option.reply_to_message_id,
-            reply_markup: Option.reply_markup,
-        });
+        let res;
+        if (!Option) {
+            res = await this.requester.post('/sendMessage', {
+                chat_id,
+                text,
+            });
+        }
+        else return;
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/sendMessage failed");
     }
     public async getUpdates(Option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
-        const res = await this.requester.post('/getUpdates', {
-            offset: Option.offset,
-            limit: Option.limit,
-            timeout: Option.timeout,
-            allow_updates: Option.allowed_updates,
-        });
+        let res;
+        if (Option) res = await this.requester.post('/getUpdates', Option);
+        else res = await this.requester.post('/getUpdates');
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/getUpdates failed");
     }
@@ -65,7 +61,7 @@ class Bot {
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
-            let msg;
+            let msg: any;
             let data: BotAPI.BotGetUpdates;
             try {
                 data = await this.getUpdates();
@@ -76,7 +72,7 @@ class Bot {
             }
             if (data.result.length === 100) {
                 try {
-                    data = await this.getUpdates({ offset: data.result[99].update_id } as BotAPI.BotOptionGetUpdates);
+                    data = await this.getUpdates({ offset: data.result[99].update_id } as BotAPI.BotOptionGetUpdates );
                 }
                 catch (err) {
                     console.log(err);
