@@ -10,27 +10,34 @@ class Bot {
     public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
         this.requester = axios.create({
             baseURL: url + token,
-            timeout: 5000,
+            timeout: 10000,
         });
         this.funcs = new Map<RegExp | string | string[], Function>();
         this.time = time;
     }
-    public async sendMessage(chat_id: number, text: string, Option?: BotAPI.BotOptionSendMessage):
+    public async sendMessage(chat_id: number, text: string, option?: BotAPI.BotOtherOptionSendMessage):
         Promise<BotAPI.BotSendMessage> {
-        let res;
-        if (!Option) {
-            res = await this.requester.post('/sendMessage', {
-                chat_id,
-                text,
-            });
+        const reqData: BotAPI.BotOptionSendMessage = {
+            chat_id,
+            text,
+        };
+        if (option) {
+            for (const i in option) {
+                if (i === 'parse_mode') reqData.parse_mode = option[i];
+                else if (i === 'disable_web_page_preview') reqData.disable_web_page_preview = option[i];
+                else if (i === 'disable_notification') reqData.disable_notification = option[i];
+                else if (i === 'reply_to_message_id') reqData.reply_to_message_id = option[i];
+                else if (i === 'reply_markup') reqData.reply_markup = option[i];
+                else continue;
+            }
         }
-        else return;
+        const res = await this.requester.post('/sendMessage', reqData);
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/sendMessage failed");
     }
-    public async getUpdates(Option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
+    public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
         let res;
-        if (Option) res = await this.requester.post('/getUpdates', Option);
+        if (Option) res = await this.requester.post('/getUpdates', option);
         else res = await this.requester.post('/getUpdates');
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/getUpdates failed");
@@ -54,7 +61,7 @@ class Bot {
             cb(msg, props);
         });
     }
-    public async getMsg(): Promise<BotAPI.BotGetUpdates> {
+    private async getMsg(): Promise<BotAPI.BotGetUpdates> {
         let data: BotAPI.BotGetUpdates;
         try {
             data = await this.getUpdates();
@@ -72,7 +79,7 @@ class Bot {
         }
         return data;
     }
-    public getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
+    private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
         let msg;
         const newDate = data.result[data.result.length - 1];
         if (newDate.message !== undefined) {

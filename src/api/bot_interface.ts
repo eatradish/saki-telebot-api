@@ -8,7 +8,17 @@ export interface BotSendMessage {
     result: BotSendMessageResult;
 }
 
+export interface BotOtherOptionSendMessage {
+    parse_mode?: string;
+    disable_web_page_preview?: boolean;
+    disable_notification?: boolean;
+    reply_to_message_id?: number;
+    reply_markup?: {};
+}
+
 export interface BotOptionSendMessage {
+    chat_id: number;
+    text: string;
     parse_mode?: string;
     disable_web_page_preview?: boolean;
     disable_notification?: boolean;
