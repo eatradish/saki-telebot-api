@@ -30,7 +30,7 @@ export interface BotOptionGetUpdates {
     offset?: number;
     limit?: number;
     timeout?: number;
-    allowed_updates: string[];
+    allowed_updates?: string[];
 }
 
 export interface BotSendMessageResult {
@@ -108,7 +108,7 @@ export interface BotGetUpdatesResultMessageFrom {
 export interface BotGetUpdatesResultChannelPost {
     message_id: number;
     chat: BotGetUpdatesResultChannelPostChat;
-    data: number;
+    date: number;
     text?: string;
     photo?: BotGetUpdatesResultMessagePhoto[];
     sticker?: BotGetUpdatesResultMessageSticker;

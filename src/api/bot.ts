@@ -1,5 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
-import { isRegExp, isString } from 'util';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { isRegExp, isString, isArray } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
 
@@ -36,7 +36,7 @@ class Bot {
         else throw new Error("/sendMessage failed");
     }
     public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
-        let res;
+        let res: AxiosResponse<BotAPI.BotGetUpdates>;
         if (Option) res = await this.requester.post('/getUpdates', option);
         else res = await this.requester.post('/getUpdates');
         if (res.status === 200 && res.data) return res.data;
@@ -54,7 +54,7 @@ class Bot {
                 if (match) props = match[0].split(' ');
             }
             else if (isString(arg) && text.split(' ')[0] === arg) props = text.split(' ');
-            else {
+            else if (isArray(arg)) {
                 props = text.split(' ');
                 if (arg.indexOf(props[0]) === -1) return;
             }
@@ -71,7 +71,7 @@ class Bot {
         }
         if (data.result.length === 100) {
             try {
-                data = await this.getUpdates({ offset: data.result[99].update_id } as BotAPI.BotOptionGetUpdates);
+                data = await this.getUpdates({ offset: data.result[99].update_id });
             }
             catch (err) {
                 console.log(err);
@@ -88,7 +88,7 @@ class Bot {
         }
         else if (newDate.channel_post !== undefined) {
             msg = newDate.channel_post;
-            msg = new BotGetUpdatesResult.ChannelPost(msg, this);
+            msg = new BotGetUpdatesResult.ChannelPostMessage(msg, this);
         }
         else if (newDate.edited_message !== undefined) {
             msg = newDate.edited_message;
