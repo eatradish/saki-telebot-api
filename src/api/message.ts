@@ -1,7 +1,7 @@
 import * as BotAPI from './bot_interface';
 import Bot from './bot';
 
-export class Messages {
+class Messages {
     public readonly message_id: number;
     public readonly chat: BotAPI.BotGetUpdatesResultMessageChat | BotAPI.BotGetUpdatesResultChannelPostChat;
     public readonly date: number;

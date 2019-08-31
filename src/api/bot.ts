@@ -37,7 +37,7 @@ class Bot {
     }
     public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
         let res: AxiosResponse<BotAPI.BotGetUpdates>;
-        if (Option) res = await this.requester.post('/getUpdates', option);
+        if (option) res = await this.requester.post('/getUpdates', option);
         else res = await this.requester.post('/getUpdates');
         if (res.status === 200 && res.data) return res.data;
         else throw new Error("/getUpdates failed");
