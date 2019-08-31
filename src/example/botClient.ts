@@ -47,12 +47,13 @@ const main = async (): Promise<void> => {
         });
         r.setPrompt('>>> ');
         r.on('line', async (input) => {
-            let arg = input.split(' ');
+            const arg = input.split(' ');
             const command = arg[0];
             if (command === 'text') {
                 const id = Number(arg[1]);
-                arg = arg.splice(-1, 2);
-                const data = arg.join('');
+                arg.shift();
+                arg.shift();
+                const data = arg.join(' ');
                 if (isNumber(id) && id !== NaN) result = await bot.sendMessage(id, data);
                 if (result !== undefined) console.log('to ' + map.get(id) + ': ' + result.result.text);
             }
