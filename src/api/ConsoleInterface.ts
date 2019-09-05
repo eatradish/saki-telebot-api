@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import 'colors';
-import Readline from 'readline';
+import * as Readline from 'readline';
 
 export default class ConsoleInterface extends EventEmitter {
     private readonly readline: Readline.Interface;
@@ -10,7 +10,6 @@ export default class ConsoleInterface extends EventEmitter {
             input: process.stdin,
             output: process.stdout,
         });
-        this.listenInput();
     }
     public info(message: string): void {
         console.log(`[ ${new Date().toLocaleString()} - INFO ] ${message}`);

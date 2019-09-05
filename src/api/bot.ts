@@ -1,5 +1,5 @@
 import * as Axios from 'axios';
-import { isRegExp, isString } from 'util';
+import { isRegExp, isString, isArray } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
 import ConsoleInterface from './ConsoleInterface';
@@ -16,6 +16,7 @@ class Bot {
             baseURL: url + token,
             timeout: 10000,
         });
+        this.evenList = [];
         this.funcs = new Map<Array<string | RegExp>, Function>();
         this.time = time;
         this.consoleTnterface = new ConsoleInterface();
@@ -79,24 +80,27 @@ class Bot {
         BotAPI.BotGetUpdatesResultEditedMessage): Promise<void> {
         const text = msg.text;
         let props: string[];
-        let match;
+        let funcMatch: Array<string | RegExp>;
         for (const even of this.evenList) {
             for (const e of even) {
-                if (isRegExp(e) && e.exec(text)) {
-                    props = match[0].split(' ');
-                    match = even
-                    break;
+                if (isRegExp(e)) {
+                    const match = e.exec(text);
+                    if (match) {
+                        props = match[0].split(' ');
+                        funcMatch = even;
+                        break;
+                    }
                 }
                 else if (isString(e) && text.indexOf(e) !== -1) {
                     props = text.split(' ');
-                    match = even;
+                    funcMatch = even;
                     break;
                 }
             }
-            if (props && match) {
-                this.funcs.get(match).call(msg, props);
-                this.consoleTnterface.emit('info', 'exec function');
-            }
+        }
+        if (props && funcMatch) {
+            const fn = this.funcs.get(funcMatch);
+            fn(msg, props);
         }
     }
     private async getMsg(): Promise<BotAPI.BotGetUpdates> {
@@ -105,20 +109,21 @@ class Bot {
             data = await this.getUpdates();
         }
         catch (err) {
-            console.log(err);
+            this.consoleTnterface.emit('error', err.message);
         }
         if (data.result.length === 100) {
             try {
                 data = await this.getUpdates({ offset: data.result[99].update_id });
             }
             catch (err) {
-                console.log(err);
+                this.consoleTnterface.emit('error', err.message);
             }
         }
         return data;
     }
     private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
         let msg;
+        if (data.result.length === 0) return;
         const newDate = data.result[data.result.length - 1];
         if (newDate.message !== undefined) {
             msg = newDate.message;
@@ -148,12 +153,14 @@ class Bot {
         while (true) {
             const data = await this.getMsg();
             const lastData = this.getLastMsg(data);
+            if (!lastData) continue;
             update_id = lastData.update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
             if (data.ok && data.result) {
                 if (update_id === new_update_id) {
                     this.execFuncs(lastData.msg);
                     new_update_id += 1;
+                    this.consoleTnterface.emit('info', 'exec function');
                 }
             }
             await sleep(this.time);
