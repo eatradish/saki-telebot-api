@@ -126,3 +126,13 @@ export interface GetLastMsg {
     msg: BotGetUpdatesResultMessage | BotGetUpdatesResultEditedMessage | BotGetUpdatesResultChannelPost;
     update_id: number;
 }
+
+export interface BotGetMe {
+    ok: boolean;
+    result: {
+        id: number;
+        is_bot: boolean;
+        first_name: string;
+        username: string;
+    };
+}

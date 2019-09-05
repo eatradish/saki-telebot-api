@@ -1,19 +1,38 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { isRegExp, isString, isArray } from 'util';
+import * as Axios from 'axios';
+import { isRegExp, isString } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
+import ConsoleInterface from './ConsoleInterface';
 
 class Bot {
-    private readonly requester: AxiosInstance;
-    private funcs: Map<RegExp | string | string[], Function>;
+    private readonly requester: Axios.AxiosInstance;
+    public readonly name: string;
+    private funcs: Map<Array<string | RegExp>, Function>;
     private time: number;
+    private evenList: Array<string | RegExp>[];
+    private consoleTnterface: ConsoleInterface;
     public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
-        this.requester = axios.create({
+        this.requester = Axios.default.create({
             baseURL: url + token,
             timeout: 10000,
         });
-        this.funcs = new Map<RegExp | string | string[], Function>();
+        this.funcs = new Map<Array<string | RegExp>, Function>();
         this.time = time;
+        this.consoleTnterface = new ConsoleInterface();
+        this.consoleTnterface.on('info', (info) => this.consoleTnterface.info(info));
+        this.consoleTnterface.on('error', (error) => this.consoleTnterface.error(error));
+    }
+    public async getMe(): Promise<BotAPI.BotGetMe> {
+        const res = await this.requester.get('/getMe');
+        if (res.status === 200 && res.data) {
+            this.consoleTnterface.emit('info', 'GET /getMe success');
+            return res.data;
+        }
+        else {
+            const err = "/getMe failed";
+            this.consoleTnterface.emit('error', err);
+            throw new Error(err);
+        }
     }
     public async sendMessage(chat_id: number, text: string, option?: BotAPI.BotOtherOptionSendMessage):
         Promise<BotAPI.BotSendMessage> {
@@ -32,34 +51,53 @@ class Bot {
             }
         }
         const res = await this.requester.post('/sendMessage', reqData);
-        if (res.status === 200 && res.data) return res.data;
-        else throw new Error("/sendMessage failed");
+        if (res.status === 200 && res.data) {
+            this.consoleTnterface.emit('info', 'POST /sendMessage success');
+            return res.data;
+        }
+        else {
+            const err = "/sendMessage failed";
+            this.consoleTnterface.emit('info', err);
+            throw new Error(err);
+        }
     }
     public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
-        let res: AxiosResponse<BotAPI.BotGetUpdates>;
-        if (option) res = await this.requester.post('/getUpdates', option);
-        else res = await this.requester.post('/getUpdates');
-        if (res.status === 200 && res.data) return res.data;
-        else throw new Error("/getUpdates failed");
+        if (!option) option = {};
+        const res = await this.requester.post('/getUpdates', option);
+        if (res.status === 200 && res.data) {
+            this.consoleTnterface.emit('info', 'POST /getupdates success');
+            return res.data;
+        }
+        else{
+            const err = "/getUpdates failed";
+            this.consoleTnterface.emit('error', err);
+            throw new Error(err);
+        }
     }
     public async execFuncs(msg: BotAPI.BotGetUpdatesResultMessage |
         BotAPI.BotGetUpdatesResultChannelPost |
         BotAPI.BotGetUpdatesResultEditedMessage): Promise<void> {
-        this.funcs.forEach((cb, arg) => {
-            const text = msg.text;
-            let match: RegExpExecArray;
-            let props: string[];
-            if (isRegExp(arg)) {
-                match = arg.exec(text);
-                if (match) props = match[0].split(' ');
+        const text = msg.text;
+        let props: string[];
+        let match;
+        for (const even of this.evenList) {
+            for (const e of even) {
+                if (isRegExp(e) && e.exec(text)) {
+                    props = match[0].split(' ');
+                    match = even
+                    break;
+                }
+                else if (isString(e) && text.indexOf(e) !== -1) {
+                    props = text.split(' ');
+                    match = even;
+                    break;
+                }
             }
-            else if (isString(arg) && text.split(' ')[0] === arg) props = text.split(' ');
-            else if (isArray(arg)) {
-                props = text.split(' ');
-                if (arg.indexOf(props[0]) === -1) return;
+            if (props && match) {
+                this.funcs.get(match).call(msg, props);
+                this.consoleTnterface.emit('info', 'exec function');
             }
-            cb(msg, props);
-        });
+        }
     }
     private async getMsg(): Promise<BotAPI.BotGetUpdates> {
         let data: BotAPI.BotGetUpdates;
@@ -100,9 +138,11 @@ class Bot {
         };
     }
     public async listen(): Promise<void> {
+        this.consoleTnterface.emit('info', 'listening');
         let update_id: number;
         let new_update_id: undefined | number;
         const sleep = ((time: number): Promise<NodeJS.Timeout> => {
+            this.consoleTnterface.emit('info', 'sleeping...');
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
@@ -119,8 +159,11 @@ class Bot {
             await sleep(this.time);
         }
     }
-    public on(match: RegExp | string | string[], cb: Function): void {
-        this.funcs.set(match, cb);
+    public on(even: RegExp | string | Array<string | RegExp>, fn: Function): void {
+        if (isRegExp(even)) even = [even] as Array<string | RegExp>;
+        else if (isString(even)) even = [even] as Array<string | RegExp>;
+        this.evenList.push(even);
+        this.funcs.set(even, fn);
     }
     public async getUserList(): Promise<Map<number, string> | undefined> {
         const data = await this.getUpdates();

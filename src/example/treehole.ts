@@ -14,8 +14,8 @@ const parser = (needParse: string): TreeHoleItem[] => {
     const html = che.html();
     const parseList = html.split("</div>");
     const parseList2 = html.split("\n");
-    let start;
-    let start2;
+    let start: number;
+    let start2: number;
     for (let i = 0; i < parseList.length; i++) {
         const isStart = parseList[i].indexOf('<ol class="commentlist" style="list-style-type: none;">') !== -1;
         if (isStart) start = i;
@@ -80,7 +80,7 @@ const treehole = async (): Promise<void> => {
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
                 bot.sendMessage(-1001292615621, 
-                    list[0].username + ': ' + list[0].text);
+                    list[0].username + list[0].text);
                 lastDataId = newLastDataId;
             }
         }
