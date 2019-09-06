@@ -68,7 +68,6 @@ const parser = (needParse: string): TreeHoleItem[] => {
 
 const treehole = async (): Promise<void> => {
     const bot = new Bot(token.treehold);
-    bot.eventInterface.on('info', (info) => bot.eventInterface.info(info));
     let lastDataId;
     const sleep = ((time: number): Promise<NodeJS.Timeout> => {
         bot.eventInterface.emit('info', 'sleeping');
