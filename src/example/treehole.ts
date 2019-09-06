@@ -82,8 +82,7 @@ const treehole = async (): Promise<void> => {
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
                 bot.eventInterface.emit('info', 'Have new treehole!');
-                bot.sendMessage(-1001292615621, 
-                    list[0].username + list[0].text);
+                bot.sendMessage(-1001292615621, list[0].username + list[0].text);
                 lastDataId = newLastDataId;
             }
         }

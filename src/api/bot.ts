@@ -108,7 +108,7 @@ class Bot {
         catch (err) {
             this.eventInterface.emit('error', err.message);
         }
-        if (data.ok && data.result.length === 100) {
+        if (data.result && data.result.length === 100) {
             try {
                 data = await this.getUpdates({ offset: data.result[99].update_id });
             }
