@@ -1,8 +1,8 @@
 import * as Axios from 'axios';
-import { isRegExp, isString, isArray } from 'util';
+import { isRegExp, isString } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
-import ConsoleInterface from './ConsoleInterface';
+import EventInterface from './EventInterface';
 
 class Bot {
     private readonly requester: Axios.AxiosInstance;
@@ -10,7 +10,7 @@ class Bot {
     private funcs: Map<Array<string | RegExp>, Function>;
     private time: number;
     private evenList: Array<string | RegExp>[];
-    private consoleTnterface: ConsoleInterface;
+    public eventInterface: EventInterface;
     public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
         this.requester = Axios.default.create({
             baseURL: url + token,
@@ -19,20 +19,19 @@ class Bot {
         this.evenList = [];
         this.funcs = new Map<Array<string | RegExp>, Function>();
         this.time = time;
-        this.consoleTnterface = new ConsoleInterface();
-        this.consoleTnterface.on('info', (info) => this.consoleTnterface.info(info));
-        this.consoleTnterface.on('error', (error) => this.consoleTnterface.error(error));
+        this.eventInterface = new EventInterface();
+        this.eventInterface.on('info', (info) => this.eventInterface.info(info));
+        this.eventInterface.on('error', (error) => this.eventInterface.error(error));
     }
     public async getMe(): Promise<BotAPI.BotGetMe> {
         const res = await this.requester.get('/getMe');
         if (res.status === 200 && res.data) {
-            this.consoleTnterface.emit('info', 'GET /getMe success');
+            this.eventInterface.emit('info', 'GET /getMe success');
             return res.data;
         }
         else {
             const err = "/getMe failed";
-            this.consoleTnterface.emit('error', err);
-            throw new Error(err);
+            this.eventInterface.emit('error', err);
         }
     }
     public async sendMessage(chat_id: number, text: string, option?: BotAPI.BotOtherOptionSendMessage):
@@ -53,26 +52,24 @@ class Bot {
         }
         const res = await this.requester.post('/sendMessage', reqData);
         if (res.status === 200 && res.data) {
-            this.consoleTnterface.emit('info', 'POST /sendMessage success');
+            this.eventInterface.emit('info', 'POST /sendMessage success');
             return res.data;
         }
         else {
             const err = "/sendMessage failed";
-            this.consoleTnterface.emit('info', err);
-            throw new Error(err);
+            this.eventInterface.emit('info', err);
         }
     }
     public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
         if (!option) option = {};
         const res = await this.requester.post('/getUpdates', option);
         if (res.status === 200 && res.data) {
-            this.consoleTnterface.emit('info', 'POST /getupdates success');
+            this.eventInterface.emit('info', 'POST /getupdates success');
             return res.data;
         }
-        else{
+        else {
             const err = "/getUpdates failed";
-            this.consoleTnterface.emit('error', err);
-            throw new Error(err);
+            this.eventInterface.emit('error', err);
         }
     }
     public async execFuncs(msg: BotAPI.BotGetUpdatesResultMessage |
@@ -109,14 +106,14 @@ class Bot {
             data = await this.getUpdates();
         }
         catch (err) {
-            this.consoleTnterface.emit('error', err.message);
+            this.eventInterface.emit('error', err.message);
         }
         if (data.result.length === 100) {
             try {
                 data = await this.getUpdates({ offset: data.result[99].update_id });
             }
             catch (err) {
-                this.consoleTnterface.emit('error', err.message);
+                this.eventInterface.emit('error', err.message);
             }
         }
         return data;
@@ -143,11 +140,11 @@ class Bot {
         };
     }
     public async listen(): Promise<void> {
-        this.consoleTnterface.emit('info', 'listening');
+        this.eventInterface.emit('info', 'listening');
         let update_id: number;
         let new_update_id: undefined | number;
         const sleep = ((time: number): Promise<NodeJS.Timeout> => {
-            this.consoleTnterface.emit('info', 'sleeping...');
+            this.eventInterface.emit('info', 'sleeping...');
             return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         });
         while (true) {
@@ -160,7 +157,7 @@ class Bot {
                 if (update_id === new_update_id) {
                     this.execFuncs(lastData.msg);
                     new_update_id += 1;
-                    this.consoleTnterface.emit('info', 'exec function');
+                    this.eventInterface.emit('info', 'exec function');
                 }
             }
             await sleep(this.time);

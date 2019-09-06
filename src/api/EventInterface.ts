@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import 'colors';
 import * as Readline from 'readline';
 
-export default class ConsoleInterface extends EventEmitter {
+export default class EventInterface extends EventEmitter {
     private readonly readline: Readline.Interface;
     public constructor() {
         super();
