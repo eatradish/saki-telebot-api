@@ -12,7 +12,7 @@ class Bot {
     private time: number;
     private evenList: Array<string | RegExp>[] = [];
     private eventInterface = new EventInterface();
-    public constructor(token: string, url = "https://api.telegram.org/bot", time = 10000) {
+    public constructor(token: string, url = "https://api.telegram.org/bot", time = 3000) {
         this.requester = Axios.default.create({
             baseURL: url + token,
             timeout: 10000,
