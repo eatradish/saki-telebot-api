@@ -1,7 +1,7 @@
 import Bot from '../api/bot';
 import * as Cheerio from 'cheerio';
 import axios from 'axios';
-import token from '../../settings';
+import token from '../settings';
 import EventInterface from '../util/EventInterface';
 
 interface TreeHoleItem {
