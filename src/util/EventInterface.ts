@@ -3,13 +3,14 @@ import 'colors';
 import * as Readline from 'readline';
 
 export default class EventInterface extends EventEmitter {
-    private readonly readline: Readline.Interface;
+    private readline: Readline.Interface;
     public constructor() {
         super();
         this.readline = Readline.createInterface({
             input: process.stdin,
             output: process.stdout,
         });
+        this.listenInput();
     }
     public info(message: string): void {
         console.log(`[ ${new Date().toLocaleString()} - INFO ] ${message}`);

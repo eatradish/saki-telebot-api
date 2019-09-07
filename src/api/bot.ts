@@ -2,26 +2,26 @@ import * as Axios from 'axios';
 import { isRegExp, isString } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
-import EventInterface from './EventInterface';
+import EventInterface from '../util/EventInterface';
+import axiosRetry from 'axios-retry';
 
 class Bot {
     private readonly requester: Axios.AxiosInstance;
     public readonly name: string;
-    private funcs: Map<Array<string | RegExp>, Function>;
+    private funcs = new Map<Array<string | RegExp>, Function>();
     private time: number;
-    private evenList: Array<string | RegExp>[];
-    public eventInterface: EventInterface;
+    private evenList: Array<string | RegExp>[] = [];
+    private eventInterface = new EventInterface();
     public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
         this.requester = Axios.default.create({
             baseURL: url + token,
             timeout: 10000,
         });
         this.evenList = [];
-        this.funcs = new Map<Array<string | RegExp>, Function>();
         this.time = time;
-        this.eventInterface = new EventInterface();
         this.eventInterface.on('info', (info) => this.eventInterface.info(info));
         this.eventInterface.on('error', (error) => this.eventInterface.error(error));
+        axiosRetry(this.requester, { retries: 3 });
     }
     public async getMe(): Promise<BotAPI.BotGetMe> {
         const res = await this.requester.get('/getMe');
@@ -120,7 +120,7 @@ class Bot {
     }
     private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
         let msg;
-        if (data.result.length === 0) return;
+        if (data.result && data.result.length === 0) return;
         const newDate = data.result[data.result.length - 1];
         if (newDate.message !== undefined) {
             msg = newDate.message;

@@ -2,6 +2,7 @@ import Bot from '../api/bot';
 import * as Cheerio from 'cheerio';
 import axios from 'axios';
 import token from '../../settings';
+import EventInterface from '../util/EventInterface';
 
 interface TreeHoleItem {
     id: number;
@@ -68,20 +69,22 @@ const parser = (needParse: string): TreeHoleItem[] => {
 
 const treehole = async (): Promise<void> => {
     const bot = new Bot(token.treehold);
-    let lastDataId;
+    const eventInterface = new EventInterface();
+    eventInterface.on('info', (info) => eventInterface.info(info));
+    let lastDataId: undefined | number;
     const sleep = ((time: number): Promise<NodeJS.Timeout> => {
-        bot.eventInterface.emit('info', 'sleeping');
+        eventInterface.emit('info', 'sleeping');
         return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
     });
     while (true) {
         const resp = await axios.get('http://jandan.net/treehole');
         if (resp.status === 200 && resp.data) {
-            bot.eventInterface.emit('info', 'GET treehole success');
+            eventInterface.emit('info', 'GET treehole success');
             const list = parser(resp.data);
             const newLastDataId = list[0].id;
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
-                bot.eventInterface.emit('info', 'Have new treehole!');
+                eventInterface.emit('info', 'Have new treehole!');
                 bot.sendMessage(-1001292615621, list[0].username + list[0].text);
                 lastDataId = newLastDataId;
             }
