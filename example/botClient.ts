@@ -1,6 +1,6 @@
 import Bot from '../api/bot';
 import * as BotAPI from '../api/bot_interface';
-import token from '../../settings';
+import token from '../settings';
 import * as readline from 'readline';
 import { Message } from '../api/message';
 import { isNumber } from 'util';

@@ -17,7 +17,6 @@ class Bot {
             baseURL: url + token,
             timeout: 10000,
         });
-        this.evenList = [];
         this.time = time;
         this.eventInterface.on('info', (info) => this.eventInterface.info(info));
         this.eventInterface.on('error', (error) => this.eventInterface.error(error));
