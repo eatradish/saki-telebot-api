@@ -7,9 +7,9 @@ import axiosRetry from 'axios-retry';
 
 export default class Bot {
     private readonly requester: Axios.AxiosInstance;
-    private funcs = new Map<Array<string | RegExp>, Function>();
     private time: number;
     private evenList: Array<string | RegExp>[] = [];
+    private funcList: Function[] = [];
     private eventInterface = new EventInterface();
     public constructor(token: string, url = "https://api.telegram.org/bot", time = 3000) {
         this.requester = Axios.default.create({
@@ -75,34 +75,38 @@ export default class Bot {
         BotGetUpdatesResult.ChannelPostMessage): Promise<void> {
         const text = msg.text;
         let props: string[] = [];
-        let funcMatch: Array<string | RegExp> = [];
+        const funcMatchIndexList: number[] = [];
         if (text === undefined) return;
-        for (const even of this.evenList) {
-            for (const e of even) {
+        for (let i = 0; i < this.evenList.length; i++) {
+            for (const e of this.evenList[i]) {
                 if (isRegExp(e)) {
                     const match = e.exec(text);
                     if (match) {
                         props = match[0].split(' ');
-                        funcMatch = even;
-                        break;
+                        funcMatchIndexList.push(i);
                     }
                 }
                 else if (isString(e) && text.indexOf(e) !== -1) {
                     props = text.split(' ');
-                    funcMatch = even;
-                    break;
+                    funcMatchIndexList.push(i);
+                }
+                else if (isString(e) && ['text'].indexOf(e) !== -1) {
+                    props = [text];
+                    funcMatchIndexList.push(i);
                 }
             }
         }
-        if (props.length !== 0 && funcMatch.length !== 0) {
-            const fn = this.funcs.get(funcMatch);
-            if (fn) fn(msg, props);
+        if (props.length !== 0 && funcMatchIndexList.length !== 0) {
+            for (const index of funcMatchIndexList) {
+                const fn = this.funcList[index];
+                if (fn) fn(msg, props);
+            }
         }
     }
-    private async getMsg(): Promise<BotAPI.BotGetUpdates | undefined> {
-        let data: BotAPI.BotGetUpdates | undefined;
+    private async getMsg(): Promise<BotAPI.BotGetUpdates | undefined | void> {
+        let data: BotAPI.BotGetUpdates | undefined | void;
         try {
-            data = await this.getUpdates();
+            data = await this.getUpdates().catch((err) => console.log(err));
         }
         catch (err) {
             this.eventInterface.emit('error', err.message);
@@ -170,8 +174,15 @@ export default class Bot {
     public on(even: RegExp | string | Array<string | RegExp>, fn: Function): void {
         if (isRegExp(even)) even = [even] as Array<string | RegExp>;
         else if (isString(even)) even = [even] as Array<string | RegExp>;
-        this.evenList.push(even);
-        this.funcs.set(even, fn);
+        if (this.funcList.indexOf(fn) !== -1 && this.evenList.indexOf(even) !== -1) {
+            const err = 'function already exist';
+            this.eventInterface.emit('error', err);
+            throw new Error(err);
+        }
+        else {
+            this.funcList.push(fn);
+            this.evenList.push(even);
+        }
     }
     public async getUserList(): Promise<Map<number, string> | undefined> {
         const data = await this.getUpdates();

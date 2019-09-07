@@ -12,7 +12,7 @@ class Messages {
         this.chat = obj.chat;
         this.date = obj.date;
     }
-    public async replyText(text: string): Promise<BotAPI.BotSendMessage> {
+    public async replyText(text: string): Promise<BotAPI.BotSendMessage | undefined> {
         return await this.bot.sendMessage(this.chat.id, text);
     }
 }

@@ -21,6 +21,7 @@
   "scripts": {
     "start_paren": "ts-node-dev --respawn --transpileOnly example/paren.ts",
     "start_botClient": "ts-node-dev --respawn --transpileOnly example/botClient.ts",
-    "start_treehole": "ts-node-dev --respawn --transpileOnly example/treehole.ts"
+    "start_treehole": "ts-node-dev --respawn --transpileOnly example/treehole.ts",
+    "build": "tsc"
   }
 }
