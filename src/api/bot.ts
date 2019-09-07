@@ -3,7 +3,7 @@ import { isRegExp, isString } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
 import EventInterface from '../util/EventInterface';
-import axiosRetry from 'axios-retry';
+import * as axiosRetry from 'axios-retry';
 
 class Bot {
     private readonly requester: Axios.AxiosInstance;
