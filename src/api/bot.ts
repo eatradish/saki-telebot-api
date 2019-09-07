@@ -21,7 +21,7 @@ class Bot {
         this.time = time;
         this.eventInterface.on('info', (info) => this.eventInterface.info(info));
         this.eventInterface.on('error', (error) => this.eventInterface.error(error));
-        axiosRetry(this.requester, { retries: 3 });
+        axiosRetry.default(this.requester, { retries: 3 });
     }
     public async getMe(): Promise<BotAPI.BotGetMe> {
         const res = await this.requester.get('/getMe');
