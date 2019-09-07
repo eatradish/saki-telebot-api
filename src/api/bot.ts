@@ -12,7 +12,7 @@ class Bot {
     private time: number;
     private evenList: Array<string | RegExp>[] = [];
     private eventInterface = new EventInterface();
-    public constructor(token: string, url = "https://api.telegram.org/bot", time = 1000) {
+    public constructor(token: string, url = "https://api.telegram.org/bot", time = 10000) {
         this.requester = Axios.default.create({
             baseURL: url + token,
             timeout: 10000,
@@ -21,7 +21,7 @@ class Bot {
         this.time = time;
         this.eventInterface.on('info', (info) => this.eventInterface.info(info));
         this.eventInterface.on('error', (error) => this.eventInterface.error(error));
-        axiosRetry.default(this.requester, { retries: 3 });
+        axiosRetry(this.requester, { retries: 3 });
     }
     public async getMe(): Promise<BotAPI.BotGetMe> {
         const res = await this.requester.get('/getMe');
@@ -143,14 +143,14 @@ class Bot {
         this.eventInterface.emit('info', 'listening');
         let update_id: number;
         let new_update_id: undefined | number;
-        const sleep = ((time: number): Promise<NodeJS.Timeout> => {
+        const sleep = (): Promise<NodeJS.Timeout> => {
             this.eventInterface.emit('info', 'sleeping...');
-            return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
-        });
-        while (true) {
+            return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, this.time));
+        }
+        const step = async (): Promise<void> => {
             const data = await this.getMsg();
             const lastData = this.getLastMsg(data);
-            if (!lastData) continue;
+            if (!lastData) return;
             update_id = lastData.update_id;
             if (new_update_id === undefined) new_update_id = update_id + 1;
             if (data.ok && data.result) {
@@ -160,7 +160,10 @@ class Bot {
                     this.eventInterface.emit('info', 'exec function');
                 }
             }
-            await sleep(this.time);
+        }
+        while (1) {
+            await step();
+            await sleep();
         }
     }
     public on(even: RegExp | string | Array<string | RegExp>, fn: Function): void {
