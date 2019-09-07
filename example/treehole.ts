@@ -77,12 +77,12 @@ const treehole = async (): Promise<void> => {
         eventInterface.emit('info', 'sleeping');
         return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
     });
-    while (true) {
+    const step = async (): Promise<void> => {
         const resp = await axios.get('http://jandan.net/treehole');
         if (resp.status === 200 && resp.data) {
             eventInterface.emit('info', 'GET treehole success');
             const list = parser(resp.data);
-            if (list === undefined) continue;
+            if (list === undefined) return;
             const newLastDataId = list[0].id;
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
@@ -92,6 +92,9 @@ const treehole = async (): Promise<void> => {
             }
         }
         else throw new Error('resp failed');
+    }
+    while (true) {
+        await step();
         await sleep(30000);
     }
 }

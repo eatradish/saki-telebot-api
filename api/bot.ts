@@ -5,7 +5,7 @@ import * as BotGetUpdatesResult from './message';
 import EventInterface from '../util/EventInterface';
 import axiosRetry from 'axios-retry';
 
-class Bot {
+export default class Bot {
     private readonly requester: Axios.AxiosInstance;
     private funcs = new Map<Array<string | RegExp>, Function>();
     private time: number;
@@ -205,6 +205,3 @@ class Bot {
         return map;
     }
 }
-
-
-export default Bot;
