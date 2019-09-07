@@ -40,7 +40,7 @@ const main = async (): Promise<void> => {
     bot.listen();
 
     const send = (map: Map<number, string>): void => {
-        let result: BotAPI.BotSendMessage;
+        let result: BotAPI.BotSendMessage | undefined;
         const r = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -61,7 +61,7 @@ const main = async (): Promise<void> => {
         });
     }
     const map = await bot.getUserList();
-    send(map);
+    if (map !== undefined) send(map);
 }
 
 main();

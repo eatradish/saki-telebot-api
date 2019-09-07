@@ -1,3 +1,5 @@
+import * as MessageObject from './message';
+
 export interface BotGetUpdates {
     ok: boolean;
     result: BotGetUpdatesResult[];
@@ -123,7 +125,7 @@ export interface BotGetUpdatesResultChannelPostChat {
 }
 
 export interface GetLastMsg {
-    msg: BotGetUpdatesResultMessage | BotGetUpdatesResultEditedMessage | BotGetUpdatesResultChannelPost;
+    msg: MessageObject.Message | MessageObject.EditedMessage | MessageObject.ChannelPostMessage;
     update_id: number;
 }
 

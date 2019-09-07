@@ -3,11 +3,10 @@ import { isRegExp, isString } from 'util';
 import * as BotAPI from './bot_interface';
 import * as BotGetUpdatesResult from './message';
 import EventInterface from '../util/EventInterface';
-import * as axiosRetry from 'axios-retry';
+import axiosRetry from 'axios-retry';
 
 class Bot {
     private readonly requester: Axios.AxiosInstance;
-    public readonly name: string;
     private funcs = new Map<Array<string | RegExp>, Function>();
     private time: number;
     private evenList: Array<string | RegExp>[] = [];
@@ -22,7 +21,7 @@ class Bot {
         this.eventInterface.on('error', (error) => this.eventInterface.error(error));
         axiosRetry(this.requester, { retries: 3 });
     }
-    public async getMe(): Promise<BotAPI.BotGetMe> {
+    public async getMe(): Promise<BotAPI.BotGetMe | undefined> {
         const res = await this.requester.get('/getMe');
         if (res.status === 200 && res.data) {
             this.eventInterface.emit('info', 'GET /getMe success');
@@ -34,7 +33,7 @@ class Bot {
         }
     }
     public async sendMessage(chat_id: number, text: string, option?: BotAPI.BotOtherOptionSendMessage):
-        Promise<BotAPI.BotSendMessage> {
+        Promise<BotAPI.BotSendMessage | undefined> {
         const reqData: BotAPI.BotOptionSendMessage = {
             chat_id,
             text,
@@ -59,7 +58,7 @@ class Bot {
             this.eventInterface.emit('info', err);
         }
     }
-    public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
+    public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates | undefined> {
         if (!option) option = {};
         const res = await this.requester.post('/getUpdates', option);
         if (res.status === 200 && res.data) {
@@ -71,12 +70,13 @@ class Bot {
             this.eventInterface.emit('error', err);
         }
     }
-    public async execFuncs(msg: BotAPI.BotGetUpdatesResultMessage |
-        BotAPI.BotGetUpdatesResultChannelPost |
-        BotAPI.BotGetUpdatesResultEditedMessage): Promise<void> {
+    public async execFuncs(msg: BotGetUpdatesResult.Message |
+        BotGetUpdatesResult.EditedMessage |
+        BotGetUpdatesResult.ChannelPostMessage): Promise<void> {
         const text = msg.text;
-        let props: string[];
-        let funcMatch: Array<string | RegExp>;
+        let props: string[] = [];
+        let funcMatch: Array<string | RegExp> = [];
+        if (text === undefined) return;
         for (const even of this.evenList) {
             for (const e of even) {
                 if (isRegExp(e)) {
@@ -94,20 +94,20 @@ class Bot {
                 }
             }
         }
-        if (props && funcMatch) {
+        if (props.length !== 0 && funcMatch.length !== 0) {
             const fn = this.funcs.get(funcMatch);
-            fn(msg, props);
+            if (fn) fn(msg, props);
         }
     }
-    private async getMsg(): Promise<BotAPI.BotGetUpdates> {
-        let data: BotAPI.BotGetUpdates;
+    private async getMsg(): Promise<BotAPI.BotGetUpdates | undefined> {
+        let data: BotAPI.BotGetUpdates | undefined;
         try {
             data = await this.getUpdates();
         }
         catch (err) {
             this.eventInterface.emit('error', err.message);
         }
-        if (data.result && data.result.length === 100) {
+        if (data && data.result && data.result.length === 100) {
             try {
                 data = await this.getUpdates({ offset: data.result[99].update_id });
             }
@@ -117,7 +117,7 @@ class Bot {
         }
         return data;
     }
-    private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
+    private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg | undefined {
         let msg;
         if (data.result && data.result.length === 0) return;
         const newDate = data.result[data.result.length - 1];
@@ -133,6 +133,7 @@ class Bot {
             msg = newDate.edited_message;
             msg = new BotGetUpdatesResult.EditedMessage(msg, this);
         }
+        if (!msg) return;
         return {
             msg,
             update_id: newDate.update_id,
@@ -142,12 +143,13 @@ class Bot {
         this.eventInterface.emit('info', 'listening');
         let update_id: number;
         let new_update_id: undefined | number;
-        const sleep = (): Promise<NodeJS.Timeout> => {
+        const sleep = (time: any): Promise<NodeJS.Timeout> => {
             this.eventInterface.emit('info', 'sleeping...');
-            return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, this.time));
+            return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, time));
         }
         const step = async (): Promise<void> => {
             const data = await this.getMsg();
+            if (!data) return;
             const lastData = this.getLastMsg(data);
             if (!lastData) return;
             update_id = lastData.update_id;
@@ -162,7 +164,7 @@ class Bot {
         }
         while (1) {
             await step();
-            await sleep();
+            await sleep(this.time);
         }
     }
     public on(even: RegExp | string | Array<string | RegExp>, fn: Function): void {
@@ -174,27 +176,31 @@ class Bot {
     public async getUserList(): Promise<Map<number, string> | undefined> {
         const data = await this.getUpdates();
         const map = new Map<number, string>();
-        let name: string;
-        let id: number;
+        let name: string | undefined;
+        let id = -1;
+        if (!data) return;
         for (const index of data.result) {
             let type: string;
             if (index.channel_post) type = 'channel';
             else if (index.edited_message) continue;
-            else type = index.message.chat.type;
-            if (type === 'group' || type === 'supergroup') {
-                name = index.message.chat.title;
-                id = index.message.chat.id;
+            else if (index.message) type = index.message.chat.type;
+            else return;
+            if (index.message) {
+                if (type === 'group' || type === 'supergroup') {
+                    name = index.message.chat.title;
+                    id = index.message.chat.id;
+                }
+                else if (type === 'private') {
+                    name = index.message.chat.username;
+                    id = index.message.chat.id;
+                }
             }
-            else if (type === 'private') {
-                name = index.message.chat.username;
-                id = index.message.chat.id;
-            }
-            else if (type === 'channel') {
+            else if (index.channel_post) {
                 name = index.channel_post.chat.title;
                 id = index.channel_post.chat.id;
             }
             else continue;
-            if (map.get(id) === undefined) map.set(id, name);
+            if (id !== -1 && !map.get(id) && name) map.set(id, name);
         }
         return map;
     }
