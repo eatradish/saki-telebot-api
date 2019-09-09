@@ -1,0 +1,13 @@
+/.git/
+/.vscode/
+/docs/
+/node_modules/
+/example/
+/dist/settings.js
+settings.ts
+.gitignore
+.npmignore
+tslint.json
+tsconfig.json
+*.log
+

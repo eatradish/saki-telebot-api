@@ -1,6 +1,6 @@
 {
-  "name": "MyTelegramBotAPI",
-  "version": "1.0.0",
+  "name": "saki-telebot-api",
+  "version": "1.0.1",
   "main": "index.js",
   "author": "eatradish <sakiiily@aosc.io>",
   "license": "MIT",
