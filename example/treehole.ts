@@ -25,12 +25,11 @@ const parser = (needParse: string): TreeHoleItem[] | undefined => {
         const isStart2 = parseList2[i].indexOf('<ol class="commentlist" style="list-style-type: none;">') !== -1;
         if (isStart2) start2 = i;
     }
-
     const tempList = [];
     const resList = [];
     let data;
     const ids = [];
-    if (start === -1 || start2 || -1 ) return;
+    if (start === -1 || start2 === -1 ) return;
     for (let i = start2; i < parseList2.length; i++) {
         if (parseList2[i].indexOf('<div class="cp-pagenavi">') !== -1) break;
         if (parseList2[i].indexOf('<li id="comment-') !== -1) {
@@ -56,6 +55,7 @@ const parser = (needParse: string): TreeHoleItem[] | undefined => {
             tempList.push(cheItemText);
         }
     }
+    console.log(tempList);
     for (let i = 0; i < ids.length; i++) {
         const id = Number(ids[i]);
         const username = tempList[i * 2];
@@ -82,7 +82,7 @@ const treehole = async (): Promise<void> => {
         if (resp.status === 200 && resp.data) {
             eventInterface.emit('info', 'GET treehole success');
             const list = parser(resp.data);
-            if (list === undefined) return;
+            if (!list) return;
             const newLastDataId = list[0].id;
             if (lastDataId === undefined) lastDataId = list[0].id;
             if (lastDataId < newLastDataId) {
