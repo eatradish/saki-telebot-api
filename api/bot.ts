@@ -21,7 +21,7 @@ export default class Bot {
         this.eventInterface.on('error', (error) => this.eventInterface.error(error));
         axiosRetry(this.requester, { retries: 3 });
     }
-    public async getMe(): Promise<BotAPI.BotGetMe | undefined> {
+    public async getMe(): Promise<BotAPI.BotGetMe> {
         const res = await this.requester.get('/getMe');
         if (res.status === 200 && res.data) {
             this.eventInterface.emit('info', 'GET /getMe success');
@@ -30,10 +30,11 @@ export default class Bot {
         else {
             const err = "/getMe failed";
             this.eventInterface.emit('error', err);
+            throw new Error(err);
         }
     }
     public async sendMessage(chat_id: number, text: string, option?: BotAPI.BotOtherOptionSendMessage):
-        Promise<BotAPI.BotSendMessage | undefined> {
+        Promise<BotAPI.BotSendMessage> {
         const reqData: BotAPI.BotOptionSendMessage = {
             chat_id,
             text,
@@ -56,9 +57,10 @@ export default class Bot {
         else {
             const err = "/sendMessage failed";
             this.eventInterface.emit('info', err);
+            throw new Error(err);
         }
     }
-    public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates | undefined> {
+    public async getUpdates(option?: BotAPI.BotOptionGetUpdates): Promise<BotAPI.BotGetUpdates> {
         if (!option) option = {};
         const res = await this.requester.post('/getUpdates', option);
         if (res.status === 200 && res.data) {
@@ -68,6 +70,7 @@ export default class Bot {
         else {
             const err = "/getUpdates failed";
             this.eventInterface.emit('error', err);
+            throw new Error(err);
         }
     }
     public async execFuncs(msg: BotGetUpdatesResult.Message |
@@ -81,7 +84,7 @@ export default class Bot {
         const funcMatchIndexList: number[] = [];
         for (let i = 0; i < this.evenList.length; i++) {
             for (const e of this.evenList[i]) {
-                if (isRegExp(e) && text)  {
+                if (isRegExp(e) && text) {
                     const match = e.exec(text);
                     if (match) {
                         props = match[0].split(' ');
@@ -118,27 +121,16 @@ export default class Bot {
             }
         }
     }
-    private async getMsg(): Promise<BotAPI.BotGetUpdates | undefined | void> {
-        let data: BotAPI.BotGetUpdates | undefined | void;
-        try {
-            data = await this.getUpdates().catch((err) => console.log(err));
-        }
-        catch (err) {
-            this.eventInterface.emit('error', err.message);
-        }
+    private async getMsg(): Promise<BotAPI.BotGetUpdates> {
+        let data = await this.getUpdates();
         if (data && data.result && data.result.length === 100) {
-            try {
-                data = await this.getUpdates({ offset: data.result[99].update_id });
-            }
-            catch (err) {
-                this.eventInterface.emit('error', err.message);
-            }
+            data = await this.getUpdates({ offset: data.result[99].update_id });
         }
         return data;
     }
-    private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg | undefined {
+    private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
         let msg;
-        if (data.result && data.result.length === 0) return;
+        if (data.result && data.result.length === 0) return {} as BotAPI.GetLastMsg;
         const newDate = data.result[data.result.length - 1];
         if (newDate.message !== undefined) {
             msg = newDate.message;
@@ -152,7 +144,7 @@ export default class Bot {
             msg = newDate.edited_message;
             msg = new BotGetUpdatesResult.EditedMessage(msg, this);
         }
-        if (!msg) return;
+        if (!msg) return {} as BotAPI.GetLastMsg;
         return {
             msg,
             update_id: newDate.update_id,
@@ -199,18 +191,18 @@ export default class Bot {
             this.evenList.push(even);
         }
     }
-    public async getUserList(): Promise<Map<number, string> | undefined> {
+    public async getUserList(): Promise<Map<number, string>> {
         const data = await this.getUpdates();
         const map = new Map<number, string>();
         let name: string | undefined;
         let id = -1;
-        if (!data) return;
+        if (!data) throw new Error('no data');
         for (const index of data.result) {
             let type: string;
             if (index.channel_post) type = 'channel';
             else if (index.edited_message) continue;
             else if (index.message) type = index.message.chat.type;
-            else return;
+            else throw new Error('no data');
             if (index.message) {
                 if (type === 'group' || type === 'supergroup') {
                     name = index.message.chat.title;
