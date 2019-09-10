@@ -74,8 +74,10 @@ export default class Bot {
         BotGetUpdatesResult.EditedMessage |
         BotGetUpdatesResult.ChannelPostMessage): Promise<void> {
         const text = msg.text;
-        const photo = (msg as BotGetUpdatesResult.Message).photo;
-        let props: string[] = [];
+        const photo = msg.photo;
+        const sticker = msg.sticker;
+        const caption = msg.caption;
+        let props: any[] = [];
         const funcMatchIndexList: number[] = [];
         for (let i = 0; i < this.evenList.length; i++) {
             for (const e of this.evenList[i]) {
@@ -94,7 +96,17 @@ export default class Bot {
                     props = [text];
                     funcMatchIndexList.push(i);
                 }
-                else if (isString(e) && photo && e === 'photo') {
+                else if (isString(e) && photo && !sticker && e === 'photo') {
+                    props = photo.slice();
+                    if (caption) props.push(caption);
+                    funcMatchIndexList.push(i);
+                }
+                else if (isString(e) && sticker && e === 'sticker') {
+                    props = [sticker];
+                    funcMatchIndexList.push(i);
+                }
+                else if (isString(e) && e === 'edit' && msg.type === 'edited_message') {
+                    props = [text];
                     funcMatchIndexList.push(i);
                 }
             }

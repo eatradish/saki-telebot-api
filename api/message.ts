@@ -5,6 +5,10 @@ class Messages {
     public readonly message_id: number;
     public readonly chat: BotAPI.BotGetUpdatesResultMessageChat | BotAPI.BotGetUpdatesResultChannelPostChat;
     public readonly date: number;
+    public text?: string;
+    public photo?: BotAPI.BotGetUpdatesResultMessagePhoto[];
+    public sticker?: BotAPI.BotGetUpdatesResultMessageSticker;
+    public caption?: string;
     protected readonly bot: Bot;
     public constructor(obj: BotAPI.BotGetUpdatesResultMessage | BotAPI.BotGetUpdatesResultChannelPost, bot: Bot) {
         this.bot = bot;
@@ -18,10 +22,6 @@ class Messages {
 }
 
 export class ChannelPostMessage extends Messages {
-    public readonly text?: string;
-    public readonly photo?: BotAPI.BotGetUpdatesResultMessagePhoto[];
-    public readonly sticker?: BotAPI.BotGetUpdatesResultMessageSticker;
-    public readonly caption?: string;
     public readonly type: string;
     public constructor(obj: BotAPI.BotGetUpdatesResultChannelPost, bot: Bot) {
         super(obj, bot);
@@ -35,10 +35,6 @@ export class ChannelPostMessage extends Messages {
 
 export class Message extends Messages {
     public readonly from: BotAPI.BotGetUpdatesResultMessageFrom;
-    public readonly text?: string;
-    public readonly photo?: BotAPI.BotGetUpdatesResultMessagePhoto[];
-    public readonly sticker?: BotAPI.BotGetUpdatesResultMessageSticker;
-    public readonly caption?: string;
     public readonly type: string;
     public constructor(obj: BotAPI.BotGetUpdatesResultMessage, bot: Bot) {
         super(obj, bot);
@@ -53,7 +49,7 @@ export class Message extends Messages {
 
 export class EditedMessage extends Messages {
     public readonly edit_date: number;
-    public readonly text: string;
+    public text: string;
     public readonly type: string;
     public constructor(obj: BotAPI.BotGetUpdatesResultEditedMessage, bot: Bot) {
         super(obj, bot);
