@@ -48,6 +48,7 @@ export interface BotGetUpdatesResult {
     message?: BotGetUpdatesResultMessage;
     channel_post?: BotGetUpdatesResultChannelPost;
     edited_message?: BotGetUpdatesResultEditedMessage;
+    reply_to_message?: BotGetUpdatesResultReplyToMessage;
 }
 
 export interface BotGetUpdatesResultEditedMessage {
@@ -125,7 +126,7 @@ export interface BotGetUpdatesResultChannelPostChat {
 }
 
 export interface GetLastMsg {
-    msg: MessageObject.Message | MessageObject.EditedMessage | MessageObject.ChannelPostMessage;
+    msg: MessageObject.default;
     update_id: number;
 }
 
@@ -137,4 +138,11 @@ export interface BotGetMe {
         first_name: string;
         username: string;
     };
+}
+
+export interface BotGetUpdatesResultReplyToMessage {
+    message_id: number;
+    from: BotGetUpdatesResultMessageFrom;
+    chat: BotGetUpdatesResultMessageChat;
+    text: string;
 }

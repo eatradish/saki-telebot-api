@@ -73,26 +73,27 @@ export default class Bot {
             throw new Error(err);
         }
     }
-    public async execFuncs(msg: BotGetUpdatesResult.Message |
-        BotGetUpdatesResult.EditedMessage |
-        BotGetUpdatesResult.ChannelPostMessage): Promise<void> {
-        const text = msg.text;
-        const photo = msg.photo;
-        const sticker = msg.sticker;
-        const caption = msg.caption;
+    public async execFuncs(msg: BotGetUpdatesResult.default): Promise<void> {
+        const type = msg.getMessageType();
+        const text = msg.getMessageText();
+        const photo = msg.getMessagePhoto();
+        const sticker = msg.getMessageSticker();
+        const caption = msg.getMessageCaption();
         let props: any[] = [];
         const funcMatchIndexList: number[] = [];
         for (let i = 0; i < this.evenList.length; i++) {
             for (const e of this.evenList[i]) {
-                if (isRegExp(e) && text) {
+                if (isRegExp(e) && type === 'text' && text) {
                     const match = e.exec(text);
                     if (match) {
-                        props = match[0].split(' ');
+                        const input = match[0];
+                        props.push(input.split('')[0])
+                        props.push(input.split('').slice(1).slice(1).join(''));
                         funcMatchIndexList.push(i);
                     }
                 }
                 else if (isString(e) && text && text.indexOf(e) !== -1) {
-                    props = text.split(' ');
+                    props = [text];
                     funcMatchIndexList.push(i);
                 }
                 else if (isString(e) && text && e === 'text') {
@@ -100,7 +101,7 @@ export default class Bot {
                     funcMatchIndexList.push(i);
                 }
                 else if (isString(e) && photo && !sticker && e === 'photo') {
-                    props = photo.slice();
+                    props = [photo];
                     if (caption) props.push(caption);
                     funcMatchIndexList.push(i);
                 }
@@ -108,7 +109,11 @@ export default class Bot {
                     props = [sticker];
                     funcMatchIndexList.push(i);
                 }
-                else if (isString(e) && e === 'edit' && msg.type === 'edited_message') {
+                else if (isString(e) && e === 'edit' && type === e) {
+                    props = [text];
+                    funcMatchIndexList.push(i);
+                }
+                else if (isString(e) && e === 'reply' && type === e) {
                     props = [text];
                     funcMatchIndexList.push(i);
                 }
@@ -129,25 +134,11 @@ export default class Bot {
         return data;
     }
     private getLastMsg(data: BotAPI.BotGetUpdates): BotAPI.GetLastMsg {
-        let msg;
         if (data.result && data.result.length === 0) return {} as BotAPI.GetLastMsg;
-        const newDate = data.result[data.result.length - 1];
-        if (newDate.message !== undefined) {
-            msg = newDate.message;
-            msg = new BotGetUpdatesResult.Message(msg, this);
-        }
-        else if (newDate.channel_post !== undefined) {
-            msg = newDate.channel_post;
-            msg = new BotGetUpdatesResult.ChannelPostMessage(msg, this);
-        }
-        else if (newDate.edited_message !== undefined) {
-            msg = newDate.edited_message;
-            msg = new BotGetUpdatesResult.EditedMessage(msg, this);
-        }
-        if (!msg) return {} as BotAPI.GetLastMsg;
+        const msg = new BotGetUpdatesResult.default(data.result[data.result.length - 1], this);
         return {
             msg,
-            update_id: newDate.update_id,
+            update_id: msg.obj.update_id,
         };
     }
     public async listen(): Promise<void> {
@@ -164,7 +155,7 @@ export default class Bot {
             const lastData = this.getLastMsg(data);
             if (!lastData) return;
             update_id = lastData.update_id;
-            if (new_update_id === undefined) new_update_id = update_id + 1;
+            if (!new_update_id) new_update_id = update_id + 1;
             if (data.ok && data.result) {
                 if (update_id === new_update_id) {
                     this.execFuncs(lastData.msg);
