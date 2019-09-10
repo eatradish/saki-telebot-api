@@ -55,7 +55,6 @@ const parser = (needParse: string): TreeHoleItem[] | undefined => {
             tempList.push(cheItemText);
         }
     }
-    console.log(tempList);
     for (let i = 0; i < ids.length; i++) {
         const id = Number(ids[i]);
         const username = tempList[i * 2];
